@@ -42,7 +42,8 @@ class Fixture(BaseHTTPRequestHandler):
         if self.path == '/tone.wav':
             data, content = audio_stream.getvalue(), 'audio/wav'
         elif self.path == '/signin':
-            data, content = b'<h1>Ventana de acceso de prueba</h1><p>Sin credenciales.</p>', 'text/html'
+            data, content = (b'<h1>Acceso de prueba, sin credenciales</h1><audio id="audio" src="/tone.wav"></audio>'
+                             b'<button style="position:absolute;top:80px;left:24px;width:180px;height:40px" onclick="document.querySelector(\'audio\').play()">Audio en ventana interna</button>'), 'text/html'
         else:
             data, content = page, 'text/html; charset=utf-8'
         self.send_response(200)
@@ -132,20 +133,29 @@ with tempfile.TemporaryDirectory(prefix='q-amusik-desktop-') as temporary:
                 QTest.mouseClick(window.browser.focusProxy(), enum(QtCore.Qt, 'MouseButton', 'LeftButton'),
                                  enum(QtCore.Qt, 'KeyboardModifier', 'NoModifier'), QtCore.QPoint(80, 200))
             elif phase == 5:
-                if not window.popups:
+                if not window.popups or not window.popups[0].web_loaded:
                     return
                 capture('desktop-auth-fixture.png')
-                window.popups[0].close()
+                QTest.mouseClick(window.popups[0].web_view.focusProxy(), enum(QtCore.Qt, 'MouseButton', 'LeftButton'),
+                                 enum(QtCore.Qt, 'KeyboardModifier', 'NoModifier'), QtCore.QPoint(80, 100))
+            elif phase == 6:
+                javascript = None
+                window.popups[0].web_view.page().runJavaScript("document.querySelector('audio').paused", result)
+            elif phase == 7:
+                if javascript is None:
+                    return
+                assert javascript is False, 'La prueba debe iniciar audio en la ventana secundaria'
                 window.show_library()
+                assert not window.popups, 'Las ventanas secundarias no deben quedar reproduciendo'
                 assert window.browser.page().isAudioMuted()
                 javascript = None
                 window.browser.page().runJavaScript("document.querySelector('audio').paused", result)
-            elif phase == 6:
+            elif phase == 8:
                 if javascript is None:
                     return
                 assert javascript is True
                 window.send_command('play')
-            elif phase == 7:
+            elif phase == 9:
                 if not window.local_playing:
                     return
                 assert window.browser.page().isAudioMuted()

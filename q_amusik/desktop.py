@@ -170,7 +170,7 @@ class DesktopWindow(QtWidgets.QMainWindow):
                     if self.local_playing:
                         self.send_command("pause")
                     if self.browser is not None:
-                        self.browser.page().setAudioMuted(self.local_playing)
+                        self.set_web_muted(self.local_playing)
                 elif self.local_playing:
                     self.silence_web()
             elif kind == "theme":
@@ -211,17 +211,27 @@ class DesktopWindow(QtWidgets.QMainWindow):
         self.active_source = "apple"
         self.send_command("pause")
         self.ensure_browser()
-        self.browser.page().setAudioMuted(self.local_playing)
+        self.set_web_muted(self.local_playing)
         self.stack.setCurrentIndex(self.web_index)
 
     def silence_web(self):
-        if self.browser is not None:
-            self.browser.page().setAudioMuted(True)
-            self.browser.page().runJavaScript("document.querySelectorAll('audio, video').forEach(media => media.pause());")
+        for page in self.web_pages():
+            page.setAudioMuted(True)
+            page.runJavaScript("document.querySelectorAll('audio, video').forEach(media => media.pause());")
+
+    def web_pages(self):
+        pages = [self.browser.page()] if self.browser is not None else []
+        return pages + [popup.web_view.page() for popup in self.popups]
+
+    def set_web_muted(self, muted):
+        for page in self.web_pages():
+            page.setAudioMuted(muted)
 
     def show_library(self):
         self.active_source = "library"
         self.silence_web()
+        for popup in list(self.popups):
+            popup.close()
         self.stack.setCurrentIndex(self.local_index)
         self.send_command("library")
         if self.container is not None:
@@ -236,7 +246,7 @@ class DesktopWindow(QtWidgets.QMainWindow):
         self.web_status.setText("Reproductor integrado" if success else "No se pudo cargar. Comprueba tu conexión y pulsa Recargar.")
 
     def create_auth_window(self):
-        if len(self.popups) >= 3 or self.closing:
+        if len(self.popups) >= 3 or self.closing or self.active_source != "apple":
             return None
         try:
             from PyQt6.QtWebEngineWidgets import QWebEngineView
@@ -249,8 +259,12 @@ class DesktopWindow(QtWidgets.QMainWindow):
         identity = QtWidgets.QLabel("Ventana de acceso · q_AMusik")
         layout.addWidget(identity)
         view = QWebEngineView(dialog)
+        dialog.web_view = view
+        dialog.web_loaded = False
+        view.loadFinished.connect(lambda success: setattr(dialog, "web_loaded", success))
         page = ApplePage(self.profile, self, view)
         view.setPage(page)
+        page.setAudioMuted(self.active_source != "apple" or self.local_playing)
         view.urlChanged.connect(lambda url: identity.setText(url.host() or "Acceso de Apple"))
         page.windowCloseRequested.connect(dialog.close)
         layout.addWidget(view)
@@ -261,6 +275,7 @@ class DesktopWindow(QtWidgets.QMainWindow):
         return page
 
     def closeEvent(self, event):
+        self.silence_web()
         self.send_command("shutdown")
         self.closing = True
         self.notifier.setEnabled(False)

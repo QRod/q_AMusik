@@ -34,6 +34,9 @@ jobs:
         run: dbus-run-session -- xvfb-run -a -s '-screen 0 1600x1200x24' /usr/bin/python3 tests/native-smoke.py
       - name: Ventana integrada y control de audio
         run: dbus-run-session -- xvfb-run -a -s '-screen 0 1600x1200x24' /usr/bin/python3 tests/desktop-smoke.py
+      - name: Reproductor público de Apple sin cuenta (servicio externo)
+        continue-on-error: true
+        run: dbus-run-session -- xvfb-run -a -s '-screen 0 1600x1200x24' /usr/bin/python3 tests/desktop-smoke.py --public-player
       - name: Construir paquete Debian
         run: |
           export SOURCE_DATE_EPOCH="$(git log -1 --format=%ct)"
