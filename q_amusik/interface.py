@@ -94,6 +94,8 @@ class Interface:
             context.add_class("dark")
         else:
             context.remove_class("dark")
+        if getattr(self, "desktop_channel", None):
+            self.desktop_channel.send({"event": "theme", "dark": context.has_class("dark")})
 
     def build_sidebar(self):
         sidebar = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)

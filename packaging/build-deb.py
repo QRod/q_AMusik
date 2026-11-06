@@ -42,7 +42,7 @@ Architecture: all
 Maintainer: q_AMusik contributors
 Section: sound
 Priority: optional
-Depends: python3 (>= 3.10), python3-gi, python3-gi-cairo, python3-mutagen, gir1.2-gtk-3.0, gir1.2-gstreamer-1.0, gstreamer1.0-plugins-base, gstreamer1.0-plugins-good, gstreamer1.0-plugins-bad, gstreamer1.0-libav, gstreamer1.0-pulseaudio, xdg-utils
+Depends: python3 (>= 3.10), python3-gi, python3-gi-cairo, python3-mutagen, python3-pyqt6.qtwebengine | python3-pyqt5.qtwebengine, gir1.2-gtk-3.0, gir1.2-gstreamer-1.0, gstreamer1.0-plugins-base, gstreamer1.0-plugins-good, gstreamer1.0-plugins-bad, gstreamer1.0-libav, gstreamer1.0-pulseaudio, xdg-utils
 Description: Biblioteca musical nativa para Ubuntu y Zorin
  Reproduce archivos locales y abre el reproductor oficial de Apple Music.
 """, encoding="utf-8")

@@ -1,14 +1,13 @@
 """Interfaz de escritorio GTK. El catálogo de Apple permanece en el navegador."""
 
 import sqlite3
-import subprocess
+import os
 import threading
 import gi
 
 gi.require_version("Gtk", "3.0")
 gi.require_version("Gdk", "3.0")
 from gi.repository import Gdk, Gio, GLib, Gtk
-from .apple import open_apple_music
 from .library import EXTENSIONS, Library, data_directory
 from .player import Player
 from .queue import Queue
@@ -20,9 +19,17 @@ def clock(seconds):
     return f"{minutes}:{seconds:02d}"
 
 
-class Window(Interface, Gtk.ApplicationWindow):
+EMBEDDED = os.environ.get("Q_AMUSIK_EMBEDDED") == "1"
+WindowBase = Gtk.Plug if EMBEDDED else Gtk.ApplicationWindow
+
+
+class Window(Interface, WindowBase):
     def __init__(self, app):
         super().__init__(application=app, title="q_AMusik")
+        self.desktop_channel = None
+        if EMBEDDED:
+            from .child_channel import ChildChannel
+            self.desktop_channel = ChildChannel(int(os.environ["Q_AMUSIK_CONTROL_FD"]), self.desktop_command)
         self.database = data_directory() / "library.db"
         self.library = Library(self.database)
         self.queue = Queue()
@@ -36,6 +43,28 @@ class Window(Interface, Gtk.ApplicationWindow):
         self.refresh()
         self.connect("destroy", self.cleanup)
         self.timer = GLib.timeout_add(400, self.tick)
+        if EMBEDDED:
+            self.get_titlebar().set_show_close_button(False)
+            if os.environ.get("Q_AMUSIK_TEST_AUDIO") == "1":
+                from gi.repository import Gst
+                sink = Gst.ElementFactory.make("fakesink")
+                sink.set_property("sync", True)
+                self.player.pipeline.set_property("audio-sink", sink)
+            GLib.idle_add(self.desktop_ready)
+
+    def desktop_ready(self):
+        self.desktop_channel.send({"event": "ready", "xid": int(self.get_id())})
+        return False
+
+    def desktop_command(self, command):
+        if command == "pause":
+            self.player.pause()
+        elif command == "play":
+            self.play_selected()
+        elif command == "library":
+            self.navigate("recent")
+        elif command == "shutdown":
+            self.destroy()
 
     def search_changed(self, *_):
         if self.view == "apple" and self.search.get_text():
@@ -48,6 +77,9 @@ class Window(Interface, Gtk.ApplicationWindow):
         self.status.set_visible(bool(text))
 
     def navigate(self, view, playlist=None, title=None):
+        if view == "apple" and self.desktop_channel:
+            self.launch_apple()
+            return
         self.view, self.playlist = view, playlist
         self.collection = None
         self.album_limit = 120
@@ -119,6 +151,8 @@ class Window(Interface, Gtk.ApplicationWindow):
             self.play(self.queue.previous())
 
     def playback_state(self, playing):
+        if self.desktop_channel:
+            self.desktop_channel.send({"event": "playing", "value": playing})
         if hasattr(self, "play_button"):
             name = "media-playback-pause-symbolic" if playing else "media-playback-start-symbolic"
             self.play_button.set_image(Gtk.Image.new_from_icon_name(name, Gtk.IconSize.BUTTON))
@@ -276,14 +310,10 @@ class Window(Interface, Gtk.ApplicationWindow):
 
     def launch_apple(self, *_):
         self.player.pause()
-        def launch():
-            try:
-                open_apple_music()
-                message = "Apple Music se ha abierto en el navegador. Inicia sesión allí."
-            except (OSError, RuntimeError, subprocess.SubprocessError):
-                message = "No se pudo abrir el navegador. Abre https://music.apple.com/ en un navegador compatible."
-            GLib.idle_add(self.notify, message)
-        threading.Thread(target=launch, daemon=True).start()
+        if self.desktop_channel:
+            self.desktop_channel.send({"event": "apple"})
+        else:
+            self.notify("Inicia q_AMusik con python3 -m q_amusik para usar el reproductor integrado.")
 
     def cleanup(self, *_):
         GLib.source_remove(self.timer)
@@ -295,11 +325,14 @@ class Window(Interface, Gtk.ApplicationWindow):
         if self.desktop_settings:
             self.desktop_settings.disconnect(self.desktop_signal)
         Gtk.StyleContext.remove_provider_for_screen(Gdk.Screen.get_default(), self.provider)
+        if self.desktop_channel:
+            self.desktop_channel.close()
 
 
 class Application(Gtk.Application):
     def __init__(self):
-        super().__init__(application_id="io.github.qrod.qAMusik", flags=Gio.ApplicationFlags.FLAGS_NONE)
+        app_id = "io.github.qrod.qAMusik.embedded" if EMBEDDED else "io.github.qrod.qAMusik"
+        super().__init__(application_id=app_id, flags=Gio.ApplicationFlags.FLAGS_NONE)
 
     def do_activate(self):
         window = self.get_active_window()
