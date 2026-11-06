@@ -1,0 +1,37 @@
+name: Linux
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  validate:
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dependencias del sistema
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-gi python3-mutagen gir1.2-gtk-3.0 gir1.2-gstreamer-1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-libav gstreamer1.0-pulseaudio xdg-utils xvfb dbus-x11 desktop-file-utils
+      - name: Pruebas de lógica
+        run: /usr/bin/python3 -m unittest discover -s tests -v
+      - name: Interfaz y reproducción sin dispositivo físico
+        run: dbus-run-session -- xvfb-run -a /usr/bin/python3 tests/native-smoke.py
+      - name: Construir paquete Debian
+        run: /usr/bin/python3 packaging/build-deb.py
+      - name: Instalar paquete y comprobar metadatos
+        run: |
+          sudo apt-get install -y ./dist/*.deb
+          dpkg-query --show q-amusik
+          desktop-file-validate /usr/share/applications/io.github.qrod.qAMusik.desktop
+      - name: Verificar paquete instalado y lanzador
+        run: |
+          dbus-run-session -- xvfb-run -a /usr/bin/python3 tests/native-smoke.py --installed
+          dbus-run-session -- xvfb-run -a q-amusik --help
+      - uses: actions/upload-artifact@v4
+        with:
+          name: q-amusik-${{ matrix.os }}
+          path: |
+            dist/*.deb
+            validation/*.png

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=q_AMusik
+Comment=Biblioteca musical local y acceso a Apple Music
+Exec=q-amusik
+Icon=io.github.qrod.qAMusik
+Terminal=false
+Categories=AudioVideo;Audio;Player;
+Keywords=Music;Apple;Audio;Musica;
+StartupNotify=true
+StartupWMClass=q_amusik

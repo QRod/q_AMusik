@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+cd /usr/share/q-amusik
+exec /usr/bin/python3 -m q_amusik "$@"

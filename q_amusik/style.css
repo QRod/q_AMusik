@@ -1,0 +1,15 @@
+/* El tema GTK del sistema conserva las señales de foco y alto contraste. */
+.sidebar { background-color: @theme_bg_color; padding: 22px 16px; border-right: 1px solid alpha(@theme_fg_color, 0.12); }
+.sidebar button { border: none; box-shadow: none; background: transparent; padding: 8px; }
+.sidebar button:hover { background: alpha(@theme_fg_color, 0.08); }
+.sidebar button label { font-size: 14px; }
+.brand { font-size: 24px; font-weight: 700; color: #c92c50; margin-bottom: 20px; }
+.eyebrow { font-size: 11px; font-weight: 700; opacity: 0.72; margin-top: 16px; }
+.page-title { font-size: 30px; font-weight: 700; }
+.section-title { font-size: 24px; font-weight: 600; }
+.muted { opacity: 0.75; }
+.player { background: @theme_bg_color; padding: 16px 24px; border-top: 1px solid alpha(@theme_fg_color, 0.12); }
+.now-playing { font-weight: 600; }
+treeview { background: @theme_base_color; }
+treeview.view { padding: 10px; }
+treeview:selected { background: @theme_selected_bg_color; color: @theme_selected_fg_color; }
