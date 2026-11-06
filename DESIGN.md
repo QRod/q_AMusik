@@ -42,8 +42,9 @@ inferiores describen la superficie implementada. No se ha acordado una metáfora
 creativa adicional.
 
 Este documento extrae valores de `q_amusik/style.css` y `q_amusik/app.py`.
-La revisión visual, las capturas y la ejecución nativa en Linux están pendientes;
-la extracción estática no certifica contraste, accesibilidad ni ajuste real.
+La ejecución nativa y las capturas están verificadas mediante el smoke test en
+Ubuntu 24.04. La captura de biblioteca se revisó para esta publicación; no es
+una auditoría completa de contraste, accesibilidad ni ajuste en todos los temas.
 
 **Key Characteristics:**
 - Widgets y tipografía del escritorio.

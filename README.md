@@ -9,6 +9,11 @@ reproductor oficial de Apple Music en el navegador. Proyecto independiente de Ap
 [Descargar .deb](https://github.com/QRod/q_AMusik/releases/tag/v0.1.0) ·
 [Instalación](docs/INSTALACION.md) · [Cambios](CHANGELOG.md) · [Licencia MIT](LICENSE)
 
+![Biblioteca local de q_AMusik ejecutada en Ubuntu con una canción de prueba.](docs/images/biblioteca-linux.png)
+
+*Captura de la prueba automatizada en Ubuntu: archivo WAV sintético y lista de
+demostración. No contiene música del catálogo ni datos de una cuenta real.*
+
 ## Instalación rápida
 
 Descarga `q-amusik_0.1.0_all.deb` y `SHA256SUMS` desde la
@@ -93,9 +98,9 @@ q-amusik
 El paquete instala sólo esta aplicación en `/usr/share/q-amusik`, su lanzador,
 icono y entrada de menú. La arquitectura `all` corresponde al código Python;
 los códecs y GTK son paquetes de la arquitectura del sistema. No incluye skills,
-herramientas compartidas, credenciales ni datos locales. La generación del paquete
-y la ejecución de GTK se validan en el flujo Linux cuando se ejecute; no se
-presenta un instalador como probado desde macOS.
+herramientas compartidas, credenciales ni datos locales. La construcción,
+instalación y ejecución de GTK ya pasaron en Ubuntu 24.04 mediante GitHub Actions.
+Consulta el [registro de validación](docs/validation.md) y los resultados de la matriz.
 
 ## Datos y privacidad
 
@@ -119,7 +124,7 @@ dbus-run-session -- xvfb-run -a /usr/bin/python3 tests/native-smoke.py
 La prueba nativa genera audio WAV sintético, verifica GTK y reproducción con un
 sumidero de prueba, y guarda capturas en `validation/`. No comprueba el dispositivo
 de audio físico, Apple ID, DRM ni una suscripción. El flujo de GitHub Actions
-preparado cubre Ubuntu 22.04/24.04; no se ha ejecutado en remoto todavía.
+incluye Ubuntu 22.04/24.04; el badge enlaza a los resultados de ambas plataformas.
 
 Arquitectura y decisiones: [docs/architecture.md](docs/architecture.md).
 

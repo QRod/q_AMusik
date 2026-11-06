@@ -7,10 +7,10 @@
 - Constructor Debian y flujo de pruebas Ubuntu preparados.
 
 ## Próximo hito · Validación en Linux
-- Ejecutar las pruebas nativas y revisar las capturas en Ubuntu/Zorin.
+- Mantener las pruebas automatizadas Ubuntu y completar la validación en Zorin.
 - Probar salida de audio real, cambios de dispositivo y formatos/códecs.
 - Probar inicio de sesión y reproducción completa del servicio en el navegador.
-- Entregar un .deb sólo después de verificar instalación y desinstalación.
+- Completar las pruebas manuales de actualización y desinstalación del .deb.
 
 ## Integración del catálogo en la interfaz propia
 - Configurar un identificador de medios y un firmante de tokens MusicKit bajo

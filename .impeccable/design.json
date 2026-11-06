@@ -9,9 +9,9 @@
       "q_amusik/app.py"
     ],
     "validation": {
-      "method": "static extraction",
-      "nativeRuntime": "pending",
-      "screenshots": "pending",
+      "method": "static extraction and Ubuntu 24.04 CI smoke test",
+      "nativeRuntime": "Ubuntu 24.04 GTK/GStreamer with Xvfb and fakesink",
+      "screenshots": "docs/images/biblioteca-linux.png",
       "visualApproval": false
     },
     "colorMeta": {
