@@ -9,7 +9,7 @@ permissions:
   contents: read
 jobs:
   validate:
-    if: ${{ !startsWith(github.ref_name, 'research/') }}
+    if: ${{ !startsWith(github.head_ref || github.ref_name, 'research/') }}
     timeout-minutes: 15
     strategy:
       matrix:
@@ -52,7 +52,8 @@ jobs:
             validation/*.png
             validation/manifest.json
   research-player:
-    if: startsWith(github.ref_name, 'research/')
+    # La investigación se dispara manualmente; también se reconoce en PR.
+    if: startsWith(github.head_ref || github.ref_name, 'research/')
     timeout-minutes: 12
     strategy:
       fail-fast: false

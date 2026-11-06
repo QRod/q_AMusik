@@ -49,6 +49,8 @@ Ubuntu 24.04 con Qt WebEngine 6.4.2 anunció AAC (`probably`), EME y Widevine.
 Se utilizó el CDM que ya estaba instalado en el runner, con perfil off-the-record
 y sin desactivar el sandbox. No se usó ninguna cuenta de Apple ni se solicitó
 una licencia. La prueba de Ubuntu 22.04 se consulta en esa misma ejecución.
+El script no mide el estado efectivo del sandbox de Chromium; sólo declara que
+no lo desactiva. Las pruebas de esta rama se lanzan manualmente desde Actions.
 
 Esto permite continuar evaluando un motor interno; no selecciona aún el runtime
 de producción ni confirma que Apple acepte el cliente. El paso siguiente necesita
