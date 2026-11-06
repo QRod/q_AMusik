@@ -25,7 +25,7 @@ jobs:
       - name: Pruebas de lógica
         run: /usr/bin/python3 -m unittest discover -s tests -v
       - name: Interfaz y reproducción sin dispositivo físico
-        run: dbus-run-session -- xvfb-run -a /usr/bin/python3 tests/native-smoke.py
+        run: dbus-run-session -- xvfb-run -a -s '-screen 0 1600x1200x24' /usr/bin/python3 tests/native-smoke.py
       - name: Construir paquete Debian
         run: |
           export SOURCE_DATE_EPOCH="$(git log -1 --format=%ct)"
@@ -39,7 +39,7 @@ jobs:
           desktop-file-validate /usr/share/applications/io.github.qrod.qAMusik.desktop
       - name: Verificar paquete instalado y lanzador
         run: |
-          dbus-run-session -- xvfb-run -a /usr/bin/python3 tests/native-smoke.py --installed
+          dbus-run-session -- xvfb-run -a -s '-screen 0 1600x1200x24' /usr/bin/python3 tests/native-smoke.py --installed
           dbus-run-session -- xvfb-run -a q-amusik --help
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
@@ -49,3 +49,4 @@ jobs:
             dist/*.deb
             dist/SHA256SUMS
             validation/*.png
+            validation/manifest.json

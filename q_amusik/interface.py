@@ -195,6 +195,7 @@ class Interface:
         playing.pack_start(details, True, True, 0)
         header.set_custom_title(playing)
         volume = Gtk.VolumeButton()
+        self.volume = volume
         volume.set_value(.8)
         self.player.volume(.8)
         volume.connect("value-changed", lambda _, value: self.player.volume(value))
@@ -264,7 +265,7 @@ class Interface:
         self.empty_help = text("Añade tus canciones favoritas y dales un lugar aquí.", "subtitle")
         self.empty_help.set_line_wrap(True)
         self.empty_box.pack_start(self.empty_help, False, False, 0)
-        self.import_empty = action_button("Añadir música", lambda *_: self.choose(True), True)
+        self.import_empty = action_button("Añadir música", self.empty_action, True)
         self.import_empty.set_halign(Gtk.Align.CENTER)
         self.empty_box.pack_start(self.import_empty, False, False, 8)
         self.library_stack.add_named(self.empty_box, "empty")
@@ -288,9 +289,17 @@ class Interface:
             self.collection_hero.show_all()
         if not self.visible_tracks:
             searching = bool(self.search.get_text())
-            self.empty.set_text("No encontramos esa canción." if searching else "Tu biblioteca empieza contigo.")
-            self.empty_help.set_text("Prueba con otro título, artista o álbum." if searching else
-                                     "Añade tus canciones favoritas y dales un lugar aquí.")
+            if searching:
+                title, help_text = "No encontramos esa canción.", "Prueba con otro título, artista o álbum."
+            elif self.view == "playlist":
+                title, help_text = "Dale música a esta lista.", "Selecciona canciones en tu biblioteca y añádelas a esta lista."
+            elif self.view == "favorites":
+                title, help_text = "Tus favoritas, en un lugar.", "Marca las canciones que más te gustan con la estrella."
+            else:
+                title, help_text = "Tu biblioteca empieza contigo.", "Añade tus canciones favoritas y dales un lugar aquí."
+            self.empty.set_text(title)
+            self.empty_help.set_text(help_text)
+            self.import_empty.set_label("Ver canciones" if self.view in ("playlist", "favorites") else "Añadir música")
             self.import_empty.set_visible(not searching)
             self.library_stack.set_visible_child_name("empty")
         elif grid_view:
@@ -299,7 +308,18 @@ class Interface:
         else:
             self.library_stack.set_visible_child_name("table")
         count = len(self.visible_tracks)
-        self.subtitle.set_text(f"{count} {'canción' if count == 1 else 'canciones'} en tu biblioteca local")
+        if self.search.get_text():
+            subtitle = f"{count} {'resultado' if count == 1 else 'resultados'}"
+        else:
+            scope = "esta lista" if self.view == "playlist" else "tu biblioteca local"
+            subtitle = f"{count} {'canción' if count == 1 else 'canciones'} en {scope}"
+        self.subtitle.set_text(subtitle)
+
+    def empty_action(self, *_):
+        if self.view in ("playlist", "favorites"):
+            self.navigate("songs")
+        else:
+            self.choose(True)
 
     def render_grid(self):
         for child in self.grid.get_children():

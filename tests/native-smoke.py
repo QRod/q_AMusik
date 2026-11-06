@@ -4,6 +4,7 @@ import os
 import sys
 import tempfile
 import subprocess
+import json
 import faulthandler
 faulthandler.enable()
 
@@ -43,13 +44,21 @@ with tempfile.TemporaryDirectory(prefix='q-amusik-smoke-') as directory:
     loop = GLib.MainLoop()
     artifact = Path('validation')
     artifact.mkdir(exist_ok=True)
+    (artifact/'manifest.json').write_text(json.dumps({
+        'synthetic': True, 'purpose': 'UI validation only',
+        'audio': '20 silent WAV tracks', 'artwork': 'original Cairo geometric fixtures',
+        'source': 'tests/demo_library.py', 'installed_in_application': False,
+    }, indent=2))
 
     def capture(name):
         print('Captura:', name, flush=True)
         # Captura X11 externa: incluye las subventanas de TreeView y evita el
         # fallo Cairo/MIME de gdk_pixbuf_get_from_window en GTK 3.
         xid = window.get_window().get_xid()
-        subprocess.run(['import', '-window', str(xid), str(artifact/name)], check=True, timeout=10)
+        native = window.get_window()
+        _, x, y = native.get_origin()
+        geometry = f'{native.get_width()}x{native.get_height()}+{x}+{y}'
+        subprocess.run(['import', '-window', 'root', '-crop', geometry, '+repage', str(artifact/name)], check=True, timeout=10)
 
     def initial():
         assert window.player.loaded and window.player.playing
@@ -87,6 +96,11 @@ with tempfile.TemporaryDirectory(prefix='q-amusik-smoke-') as directory:
         window.player.seek(1)
 
     def playlist_view():
+        window.table.get_selection().select_path(Gtk.TreePath.new_from_indices([1]))
+        assert len(window.selected()) == 2
+        window.table.grab_focus()
+
+    def playlist_capture():
         capture('playlist-dark.png')
         window.settings.set_property('gtk-application-prefer-dark-theme', False)
         window.navigate('songs')
@@ -94,6 +108,13 @@ with tempfile.TemporaryDirectory(prefix='q-amusik-smoke-') as directory:
 
     def compact():
         capture('compact-songs.png')
+        window.volume.set_value(.35)
+        assert abs(window.player.pipeline.get_property('volume') - .35) < .001
+        window.volume.emit('popup')
+
+    def volume_capture():
+        capture('volume-light.png')
+        window.volume.emit('popdown')
         window.navigate('recent')
 
     def compact_grid():
@@ -113,6 +134,7 @@ with tempfile.TemporaryDirectory(prefix='q-amusik-smoke-') as directory:
         capture('apple-dark.png')
         assert window.stack.get_visible_child_name() == 'apple'
         empty_playlist = window.library.create_playlist('Lista vacía')
+        window.refresh_playlists()
         window.navigate('playlist', empty_playlist, 'Lista vacía')
         assert window.library_stack.get_visible_child_name() == 'empty'
 
@@ -124,7 +146,7 @@ with tempfile.TemporaryDirectory(prefix='q-amusik-smoke-') as directory:
         capture('error-dark.png')
         window.player.pause()
 
-    steps = iter([initial, dark, artists, album, playlist_view, compact, compact_grid, no_results, apple, empty, error_view])
+    steps = iter([initial, dark, artists, album, playlist_view, playlist_capture, compact, volume_capture, compact_grid, no_results, apple, empty, error_view])
     def advance():
         try:
             step = next(steps)
