@@ -19,6 +19,7 @@ def main():
     output.mkdir(exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="q-amusik-deb-") as directory:
         package = Path(directory)
+        package.chmod(0o755)
         app = package / "usr/share/q-amusik/q_amusik"
         shutil.copytree(ROOT / "q_amusik", app, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
         files = {
@@ -26,6 +27,7 @@ def main():
             "packaging/io.github.qrod.qAMusik.desktop": "usr/share/applications/io.github.qrod.qAMusik.desktop",
             "assets/io.github.qrod.qAMusik.svg": "usr/share/icons/hicolor/scalable/apps/io.github.qrod.qAMusik.svg",
             "README.md": "usr/share/doc/q-amusik/README.md",
+            "LICENSE": "usr/share/doc/q-amusik/copyright",
         }
         for source, destination in files.items():
             target = package / destination
