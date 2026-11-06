@@ -30,6 +30,7 @@ class Window(Interface, WindowBase):
         if EMBEDDED:
             self.set_decorated(False)
         self.desktop_channel = None
+        self._closed = False
         if EMBEDDED:
             from .child_channel import ChildChannel
             self.desktop_channel = ChildChannel(int(os.environ["Q_AMUSIK_CONTROL_FD"]), self.desktop_command)
@@ -75,7 +76,10 @@ class Window(Interface, WindowBase):
         elif command == "library":
             self.navigate("recent")
         elif command == "shutdown":
-            self.destroy()
+            # El contenedor posee el ciclo de vida de la ventana X11 alojada.
+            # Liberar recursos y salir evita destruir el Gtk.Plug dos veces.
+            self.cleanup()
+            self.get_application().quit()
 
     def search_changed(self, *_):
         if self.view == "apple" and self.search.get_text():
@@ -327,6 +331,9 @@ class Window(Interface, WindowBase):
             self.notify("Inicia q_AMusik con python3 -m q_amusik para usar el reproductor integrado.")
 
     def cleanup(self, *_):
+        if self._closed:
+            return
+        self._closed = True
         GLib.source_remove(self.timer)
         self.player.close()
         self.library.close()

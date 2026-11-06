@@ -194,6 +194,7 @@ class DesktopWindow(QtWidgets.QMainWindow):
     def check_startup(self):
         if self.container is None and not self.closing:
             self.loading.setText("No se pudo abrir la biblioteca. Comprueba las dependencias GTK y que X11/XWayland esté disponible.")
+            self.stack.setCurrentWidget(self.loading)
 
     def apply_theme(self, dark):
         background, foreground, surface = ("#1e1e20", "#f4f4f5", "#28282c") if dark else ("#ffffff", "#242426", "#f3f2f5")
@@ -280,7 +281,11 @@ class DesktopWindow(QtWidgets.QMainWindow):
             from PyQt5.QtWebEngineWidgets import QWebEngineView
         dialog = QtWidgets.QDialog(self)
         dialog.setWindowTitle("Acceso de Apple · q_AMusik")
-        dialog.resize(600, 760)
+        screen = self.screen().availableGeometry()
+        dialog.resize(min(600, screen.width()-64), min(760, screen.height()-64))
+        center = self.frameGeometry().center() - dialog.rect().center()
+        dialog.move(max(screen.left(), min(center.x(), screen.right()-dialog.width())),
+                    max(screen.top(), min(center.y(), screen.bottom()-dialog.height())))
         layout = QtWidgets.QVBoxLayout(dialog)
         identity = QtWidgets.QLabel("Ventana de acceso · q_AMusik")
         layout.addWidget(identity)

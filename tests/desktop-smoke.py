@@ -113,18 +113,23 @@ with tempfile.TemporaryDirectory(prefix='q-amusik-desktop-') as temporary:
                     return
                 assert not window.browser.page().isAudioMuted()
                 assert int(window.winId()) == native_xid, 'La superficie nativa no debe recrearse al abrir WebEngine'
-                capture('apple-public.png' if public else 'desktop-web-fixture.png')
                 if public:
-                    window.browser.page().runJavaScript('document.title', result)
+                    window.browser.page().runJavaScript("({title:document.title,controls:document.querySelectorAll('button,a,[role=button]').length,unsupported:/unsupported browser|browser is not supported|access denied/i.test(document.body.innerText)})", result)
                 else:
+                    capture('desktop-web-fixture.png')
                     QTest.mouseClick(window.browser.focusProxy(), enum(QtCore.Qt, 'MouseButton', 'LeftButton'),
                                      enum(QtCore.Qt, 'KeyboardModifier', 'NoModifier'), QtCore.QPoint(80, 140))
             elif phase == 3:
                 if public:
                     if javascript is None:
                         return
-                    assert 'music' in str(javascript).lower(), javascript
-                    print('Reproductor oficial cargado, sin cuenta; título:', javascript, flush=True)
+                    assert 'music' in javascript['title'].lower() and not javascript['unsupported'], javascript
+                    if javascript['controls'] == 0:
+                        javascript = None
+                        window.browser.page().runJavaScript("({title:document.title,controls:document.querySelectorAll('button,a,[role=button]').length,unsupported:/unsupported browser|browser is not supported|access denied/i.test(document.body.innerText)})", result)
+                        return
+                    capture('apple-public.png')
+                    print('Reproductor oficial cargado, sin cuenta; título:', javascript['title'], flush=True)
                     window.close()
                     app.quit()
                     return
@@ -181,6 +186,6 @@ with tempfile.TemporaryDirectory(prefix='q-amusik-desktop-') as temporary:
     server.shutdown()
     server.server_close()
     assert not errors, errors
-    assert window.child.poll() is not None
+    assert window.child.poll() == 0, ('Salida del proceso GTK', window.child.returncode)
     if not public:
         print('GTK alojado, WebEngine dentro de la ventana, audio web/local y popup interno: OK')
