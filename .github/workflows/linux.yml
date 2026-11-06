@@ -9,6 +9,7 @@ permissions:
   contents: read
 jobs:
   validate:
+    if: ${{ !startsWith(github.ref_name, 'research/') }}
     timeout-minutes: 15
     strategy:
       matrix:
@@ -50,3 +51,32 @@ jobs:
             dist/SHA256SUMS
             validation/*.png
             validation/manifest.json
+  research-player:
+    if: startsWith(github.ref_name, 'research/')
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            qt: '5'
+            package: python3-pyqt5.qtwebengine
+          - os: ubuntu-24.04
+            qt: '6'
+            package: python3-pyqt6.qtwebengine
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Instalar motor de diagnóstico
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ${{ matrix.package }} xvfb
+      - name: Comprobar prerrequisitos, sin cuenta ni licencia Apple
+        run: xvfb-run -a -s '-screen 0 1280x800x24' /usr/bin/python3 research/probe_player.py --qt '${{ matrix.qt }}' --output validation/player-capabilities.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: player-capabilities-${{ matrix.os }}
+          path: validation/player-capabilities.json
