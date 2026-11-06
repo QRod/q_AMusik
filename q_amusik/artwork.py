@@ -51,6 +51,8 @@ class ArtworkCache:
         self.executor = ThreadPoolExecutor(max_workers=2, thread_name_prefix="artwork")
         self.cache = OrderedDict()
         self.pending = {}
+        self.waiting = OrderedDict()
+        self.active = set()
         self.closed = False
 
     def request(self, path, size, callback):
@@ -65,11 +67,19 @@ class ArtworkCache:
         if key in self.pending:
             self.pending[key].append(reference)
             return
-        if len(self.pending) >= 160:
-            return
         self.pending[key] = [reference]
-        future = self.executor.submit(self.decode, path, size)
-        future.add_done_callback(lambda job: GLib.idle_add(self.complete, key, job))
+        self.waiting[key] = None
+        self.drain()
+
+    def drain(self):
+        while self.waiting and len(self.active) < 8 and not self.closed:
+            key, _ = self.waiting.popitem(last=False)
+            if not any(reference() for reference in self.pending[key]):
+                self.pending.pop(key)
+                continue
+            self.active.add(key)
+            future = self.executor.submit(self.decode, *key)
+            future.add_done_callback(lambda job, k=key: GLib.idle_add(self.complete, k, job))
 
     @staticmethod
     def decode(path, size):
@@ -87,6 +97,7 @@ class ArtworkCache:
 
     def complete(self, key, future):
         callbacks = self.pending.pop(key, [])
+        self.active.discard(key)
         if self.closed or future.cancelled():
             return False
         try:
@@ -100,11 +111,13 @@ class ArtworkCache:
             callback = reference()
             if callback:
                 callback(pixbuf, key[0])
+        self.drain()
         return False
 
     def close(self):
         self.closed = True
         self.pending.clear()
+        self.waiting.clear()
         self.executor.shutdown(wait=False, cancel_futures=True)
 
 

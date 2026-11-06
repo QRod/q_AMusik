@@ -3,6 +3,9 @@ from pathlib import Path
 import os
 import sys
 import tempfile
+import cairo
+import faulthandler
+faulthandler.enable()
 
 source = Path('/usr/share/q-amusik') if '--installed' in sys.argv else Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(source))
@@ -39,10 +42,14 @@ with tempfile.TemporaryDirectory(prefix='q-amusik-smoke-') as directory:
     artifact.mkdir(exist_ok=True)
 
     def capture(name):
-        native = window.get_window()
-        image = Gdk.pixbuf_get_from_window(native, 0, 0, native.get_width(), native.get_height())
-        assert image is not None
-        image.savev(str(artifact/name), 'png', [], [])
+        print('Captura:', name, flush=True)
+        # Render GTK con la asignación real. Evita el fallo Cairo/MIME de
+        # gdk_pixbuf_get_from_window en ciertas versiones de GTK 3/X11.
+        image = cairo.ImageSurface(cairo.FORMAT_ARGB32,
+                                   window.get_allocated_width(), window.get_allocated_height())
+        window.draw(cairo.Context(image))
+        image.write_to_png(str(artifact/name))
+        image.finish()
 
     def initial():
         assert window.player.loaded and window.player.playing
