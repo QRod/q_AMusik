@@ -1,0 +1,8 @@
+{
+  "synthetic": true,
+  "purpose": "UI validation only",
+  "audio": "20 silent WAV tracks",
+  "artwork": "original Cairo geometric fixtures",
+  "source": "tests/demo_library.py",
+  "installed_in_application": false
+}

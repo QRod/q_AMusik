@@ -1,5 +1,30 @@
 # Verificación · 2026-11-06
 
+## Rediseño v0.2.0
+
+El rediseño conserva GTK/GStreamer y SQLite. La revisión visual independiente de
+Impeccable emitió **ship** sobre 12 capturas X11: biblioteca clara/oscura, artistas,
+detalle de álbum, lista multiselección, canciones y cuadrícula compactas,
+volumen desplegado, búsqueda sin resultados, Apple Music, lista vacía y error.
+Los fixtures son 20 WAV silenciosos con arte geométrico original; el manifiesto
+está en `docs/images/manifest.json` y no se incluye en el paquete de aplicación.
+
+La [ejecución 42297313036](https://github.com/QRod/q_AMusik/actions/runs/42297313036)
+incluye pruebas de 16 casos de lógica, GTK y reinstalación del paquete. La nueva
+prueba solicita 240 carátulas simultáneas y exige recibir todas, conservando un
+máximo de ocho trabajos activos y una caché de 128 imágenes.
+
+Las capturas anteriores con `Gtk.Widget.draw` omitían subventanas de tabla y dos
+estados no habían completado su asignación. Se descartaron para evaluación;
+la evidencia final usa ImageMagick/X11 y estados separados en el bucle GTK.
+Tampoco se usa `gdk_pixbuf_get_from_window`, que provocaba un aborto Cairo/MIME
+en el entorno de Ubuntu 22.04. Son cambios del método de captura de pruebas.
+
+El seguimiento de tema utiliza notificaciones GTK y la preferencia de color
+del escritorio cuando existe. Las pruebas conmutan GTK y comprueban las dos
+paletas; no sustituyen una prueba en todos los escritorios o lectores de pantalla.
+No se ejecuta el detector HTML de Impeccable porque la superficie es GTK nativa.
+
 ## Ejecutada en el equipo de desarrollo (macOS)
 - `python3 -m unittest discover -s tests -v`: 15 pruebas pasan.
 - Sintaxis Python con `compileall`: correcta.

@@ -1,4 +1,4 @@
-# q_AMusik · 0.1.0
+# q_AMusik · 0.2.0
 
 Aplicación de escritorio **nativa para Linux**, inspirada en Apple Music.
 Primera versión de desarrollo: reproductor local GTK/GStreamer y acceso al
@@ -6,24 +6,31 @@ reproductor oficial de Apple Music en el navegador. Proyecto independiente de Ap
 
 [![Linux](https://github.com/QRod/q_AMusik/actions/workflows/linux.yml/badge.svg)](https://github.com/QRod/q_AMusik/actions/workflows/linux.yml)
 
-[Descargar .deb](https://github.com/QRod/q_AMusik/releases/tag/v0.1.0) ·
+[Descargar .deb](https://github.com/QRod/q_AMusik/releases/tag/v0.2.0) ·
 [Instalación](docs/INSTALACION.md) · [Cambios](CHANGELOG.md) · [Licencia MIT](LICENSE)
 
-![Biblioteca local de q_AMusik ejecutada en Ubuntu con una canción de prueba.](docs/images/biblioteca-linux.png)
+![Biblioteca local de q_AMusik ejecutada en Ubuntu con álbumes y carátulas de demostración.](docs/images/biblioteca-clara.png)
 
-*Captura de la prueba automatizada en Ubuntu: archivo WAV sintético y lista de
+*Captura de la prueba automatizada en Ubuntu: archivos WAV y carátulas geométricas de
 demostración. No contiene música del catálogo ni datos de una cuenta real.*
+
+<details>
+<summary>Modo oscuro</summary>
+
+![La misma biblioteca sintética en modo oscuro.](docs/images/biblioteca-oscura.png)
+
+</details>
 
 ## Instalación rápida
 
-Descarga `q-amusik_0.1.0_all.deb` y `SHA256SUMS` desde la
-[publicación v0.1.0](https://github.com/QRod/q_AMusik/releases/tag/v0.1.0).
+Descarga `q-amusik_0.2.0_all.deb` y `SHA256SUMS` desde la
+[publicación v0.2.0](https://github.com/QRod/q_AMusik/releases/tag/v0.2.0).
 En la carpeta donde guardaste ambos archivos:
 
 ```sh
 sha256sum -c SHA256SUMS
 sudo apt update
-sudo apt install ./q-amusik_0.1.0_all.deb
+sudo apt install ./q-amusik_0.2.0_all.deb
 q-amusik
 ```
 
@@ -38,8 +45,10 @@ respaldo y desinstalación.
 | Biblioteca local | Importar archivos o carpetas recursivamente; sin copiar el audio |
 | Formatos | MP3, FLAC, Ogg, Opus, M4A/AAC, WAV y AIFF, según códecs instalados |
 | Metadatos | Título, artista, álbum y duración; nombre de archivo como alternativa |
-| Organización | Búsqueda local, favoritos, listas; vistas ordenadas por artista o álbum |
+| Organización | Búsqueda, favoritos y listas; cuadrículas de álbumes/artistas y tabla de canciones |
 | Reproducción local | Pausa, anterior/siguiente, posición, volumen, aleatorio, repetición |
+| Carátulas | Incrustadas en MP3/FLAC/M4A o imágenes cover/folder JPG y PNG de la carpeta |
+| Apariencia | Claro y oscuro siguiendo las preferencias del escritorio |
 | Persistencia | SQLite en el directorio de datos del usuario |
 | Suscripción de Apple Music | Abrir `music.apple.com` en navegador; sesión y reproducción allí |
 | Catálogo dentro de esta interfaz | Pendiente: MusicKit, credenciales de desarrollador y validación DRM |
@@ -58,7 +67,7 @@ No ejecutes la aplicación como root.
 
 ```sh
 sudo apt update
-sudo apt install python3-gi python3-mutagen gir1.2-gtk-3.0 gir1.2-gstreamer-1.0 \
+sudo apt install python3-gi python3-gi-cairo python3-mutagen gir1.2-gtk-3.0 gir1.2-gstreamer-1.0 \
   gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad \
   gstreamer1.0-libav gstreamer1.0-pulseaudio xdg-utils
 git clone https://github.com/QRod/q_AMusik.git
@@ -77,6 +86,11 @@ instalado mediante APT. No hay dependencias de pip ni Node para ejecutar la app.
 Durante una importación puedes buscar y reproducir. La edición de favoritos,
 listas y referencias espera hasta que termine el escaneo para evitar bloqueos.
 
+La apariencia sigue el tema GTK del escritorio y, cuando está disponible, la
+preferencia clara/oscura de GNOME/Zorin. Las carátulas se leen de las etiquetas
+del archivo o de `cover.jpg`, `cover.png`, `folder.jpg` y `folder.png` en su carpeta.
+Cuando no hay imagen, se muestra un sustituto neutro; no se descarga arte externo.
+
 Si hay Chrome/Chromium instalado, se solicita una ventana de aplicación del
 navegador; de lo contrario se utiliza el navegador predeterminado. q_AMusik no
 instala navegadores ni módulos DRM. Comprueba el permiso de contenido protegido
@@ -91,7 +105,7 @@ En Linux con `dpkg-deb`:
 
 ```sh
 python3 packaging/build-deb.py
-sudo apt install ./dist/q-amusik_0.1.0_all.deb
+sudo apt install ./dist/q-amusik_0.2.0_all.deb
 q-amusik
 ```
 
@@ -117,12 +131,12 @@ No hay servidor, telemetría, subida de archivos ni almacenamiento de Apple ID.
 ```sh
 python3 -m unittest discover -s tests -v
 python3 -m compileall -q q_amusik packaging tests
-# Sólo Linux, con xvfb y dbus-x11:
-dbus-run-session -- xvfb-run -a /usr/bin/python3 tests/native-smoke.py
+# Sólo Linux, con xvfb, dbus-x11 e imagemagick:
+dbus-run-session -- xvfb-run -a -s '-screen 0 1600x1200x24' /usr/bin/python3 tests/native-smoke.py
 ```
 
 La prueba nativa genera audio WAV sintético, verifica GTK y reproducción con un
-sumidero de prueba, y guarda capturas en `validation/`. No comprueba el dispositivo
+sumidero de prueba, comprueba las vistas y ambos temas, y guarda capturas en `validation/`. No comprueba el dispositivo
 de audio físico, Apple ID, DRM ni una suscripción. El flujo de GitHub Actions
 incluye Ubuntu 22.04/24.04; el badge enlaza a los resultados de ambas plataformas.
 

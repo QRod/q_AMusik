@@ -1,6 +1,6 @@
 # Instalar q_AMusik en Ubuntu / Zorin
 
-Versión inicial **0.1.0**. La biblioteca local es nativa; Apple Music se abre en
+Versión inicial **0.2.0**. La biblioteca local es nativa; Apple Music se abre en
 el navegador. No es todavía un reemplazo completo de la aplicación de macOS.
 
 ## Requisitos
@@ -17,17 +17,17 @@ confirmación en equipos reales.
 
 ## Descargar, verificar e instalar
 
-Desde [la publicación v0.1.0](https://github.com/QRod/q_AMusik/releases/tag/v0.1.0),
-descarga `q-amusik_0.1.0_all.deb` y `SHA256SUMS` en una misma carpeta, o usa:
+Desde [la publicación v0.2.0](https://github.com/QRod/q_AMusik/releases/tag/v0.2.0),
+descarga `q-amusik_0.2.0_all.deb` y `SHA256SUMS` en una misma carpeta, o usa:
 
 ```sh
-mkdir -p ~/Descargas/q-AMusik-0.1.0
-cd ~/Descargas/q-AMusik-0.1.0
-curl -fLO https://github.com/QRod/q_AMusik/releases/download/v0.1.0/q-amusik_0.1.0_all.deb
-curl -fLO https://github.com/QRod/q_AMusik/releases/download/v0.1.0/SHA256SUMS
+mkdir -p ~/Descargas/q-AMusik-0.2.0
+cd ~/Descargas/q-AMusik-0.2.0
+curl -fLO https://github.com/QRod/q_AMusik/releases/download/v0.2.0/q-amusik_0.2.0_all.deb
+curl -fLO https://github.com/QRod/q_AMusik/releases/download/v0.2.0/SHA256SUMS
 sha256sum -c SHA256SUMS
 sudo apt update
-sudo apt install ./q-amusik_0.1.0_all.deb
+sudo apt install ./q-amusik_0.2.0_all.deb
 ```
 
 Continúa con la instalación sólo si la comprobación muestra `OK`. La suma
@@ -56,7 +56,9 @@ cuenta, la suscripción y los permisos de contenido protegido del navegador.
 ## Actualizar y desinstalar
 
 Para actualizar, descarga el `.deb` de la versión deseada y su `SHA256SUMS`,
-verifica la suma y repite `sudo apt install ./nombre-del-paquete.deb`.
+verifica la suma, cierra q_AMusik y repite `sudo apt install ./nombre-del-paquete.deb`.
+Abre de nuevo la aplicación para cargar la nueva interfaz. La actualización
+desde 0.1.0 conserva la base de canciones, favoritos y listas.
 
 ```sh
 sudo apt remove q-amusik

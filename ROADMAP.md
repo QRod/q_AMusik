@@ -21,7 +21,7 @@
 - Listas de Apple, cola, favoritos y letras sólo donde la API lo permita.
 
 ## Reproductor local avanzado
-- Carátulas, cuadrícula de álbumes, páginas de artista y orden por pista/disco.
+- Orden por pista/disco y metadatos ampliados de álbum.
 - Renombrar/eliminar listas, reordenar cola y listas e importar/exportar M3U.
 - Integración MPRIS, teclas multimedia, preferencias y persistencia de volumen.
 - Detección de cambios en carpetas y archivos movidos; bibliotecas grandes.

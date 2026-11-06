@@ -1,78 +1,286 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-06T20:55:10.097601+00:00",
+  "generatedAt": "2026-11-06T21:34:49.365481+00:00",
   "title": "Design System: q_AMusik",
   "extensions": {
-    "platform": "GTK 3 desktop; HTML snippets are documentation analogues, not native previews.",
+    "platform": "GTK 3 desktop. HTML snippets are documentation analogues only.",
     "sources": [
       "q_amusik/style.css",
+      "q_amusik/interface.py",
+      "q_amusik/artwork.py",
       "q_amusik/app.py"
     ],
     "validation": {
-      "method": "static extraction and Ubuntu 24.04 CI smoke test",
-      "nativeRuntime": "Ubuntu 24.04 GTK/GStreamer with Xvfb and fakesink",
-      "screenshots": "docs/images/biblioteca-linux.png",
-      "visualApproval": false
+      "method": "Independent visual SHIP review of twelve native GTK X11 screenshots with identified demonstration fixtures.",
+      "screenshots": [
+        "docs/images/biblioteca-clara.png",
+        "docs/images/biblioteca-oscura.png"
+      ],
+      "visualApproval": true,
+      "limits": [
+        "Not an exhaustive accessibility, contrast or desktop-theme audit.",
+        "HTML detectors are not applicable to native GTK."
+      ]
     },
     "colorMeta": {
-      "brand": {
+      "light-content": {
+        "role": "neutral",
+        "displayName": "light content"
+      },
+      "dark-content": {
+        "role": "neutral",
+        "displayName": "dark content"
+      },
+      "light-text": {
+        "role": "neutral",
+        "displayName": "light text"
+      },
+      "dark-text": {
+        "role": "neutral",
+        "displayName": "dark text"
+      },
+      "light-sidebar": {
+        "role": "neutral",
+        "displayName": "light sidebar"
+      },
+      "dark-sidebar": {
+        "role": "neutral",
+        "displayName": "dark sidebar"
+      },
+      "light-header": {
+        "role": "neutral",
+        "displayName": "light header"
+      },
+      "dark-header": {
+        "role": "neutral",
+        "displayName": "dark header"
+      },
+      "light-divider": {
+        "role": "neutral",
+        "displayName": "light divider"
+      },
+      "dark-divider": {
+        "role": "neutral",
+        "displayName": "dark divider"
+      },
+      "light-accent": {
         "role": "primary",
-        "displayName": "Acento de marca"
+        "displayName": "light accent"
+      },
+      "dark-accent": {
+        "role": "primary",
+        "displayName": "dark accent"
+      },
+      "light-primary": {
+        "role": "primary",
+        "displayName": "light primary"
+      },
+      "light-primary-hover": {
+        "role": "primary",
+        "displayName": "light primary hover"
+      },
+      "dark-primary": {
+        "role": "primary",
+        "displayName": "dark primary"
+      },
+      "dark-primary-hover": {
+        "role": "primary",
+        "displayName": "dark primary hover"
+      },
+      "light-secondary": {
+        "role": "neutral",
+        "displayName": "light secondary"
+      },
+      "dark-secondary": {
+        "role": "neutral",
+        "displayName": "dark secondary"
+      },
+      "light-muted": {
+        "role": "neutral",
+        "displayName": "light muted"
+      },
+      "dark-muted": {
+        "role": "neutral",
+        "displayName": "dark muted"
+      },
+      "light-nav-selected": {
+        "role": "neutral",
+        "displayName": "light nav selected"
+      },
+      "dark-nav-selected": {
+        "role": "neutral",
+        "displayName": "dark nav selected"
+      },
+      "light-search": {
+        "role": "neutral",
+        "displayName": "light search"
+      },
+      "dark-search": {
+        "role": "neutral",
+        "displayName": "dark search"
+      },
+      "light-hover": {
+        "role": "neutral",
+        "displayName": "light hover"
+      },
+      "dark-hover": {
+        "role": "neutral",
+        "displayName": "dark hover"
+      },
+      "light-active": {
+        "role": "neutral",
+        "displayName": "light active"
+      },
+      "dark-active": {
+        "role": "neutral",
+        "displayName": "dark active"
+      },
+      "focus": {
+        "role": "primary",
+        "displayName": "focus"
+      },
+      "light-selection": {
+        "role": "neutral",
+        "displayName": "light selection"
+      },
+      "dark-selection": {
+        "role": "neutral",
+        "displayName": "dark selection"
+      },
+      "light-selection-text": {
+        "role": "neutral",
+        "displayName": "light selection text"
+      },
+      "dark-selection-text": {
+        "role": "neutral",
+        "displayName": "dark selection text"
+      },
+      "dark-toggle-text": {
+        "role": "neutral",
+        "displayName": "dark toggle text"
+      },
+      "light-cover": {
+        "role": "neutral",
+        "displayName": "light cover"
+      },
+      "dark-cover": {
+        "role": "neutral",
+        "displayName": "dark cover"
+      },
+      "light-cover-symbol": {
+        "role": "neutral",
+        "displayName": "light cover symbol"
+      },
+      "dark-cover-symbol": {
+        "role": "neutral",
+        "displayName": "dark cover symbol"
+      },
+      "light-card-hover": {
+        "role": "neutral",
+        "displayName": "light card hover"
+      },
+      "dark-card-hover": {
+        "role": "neutral",
+        "displayName": "dark card hover"
+      },
+      "light-track": {
+        "role": "neutral",
+        "displayName": "light track"
+      },
+      "dark-track": {
+        "role": "neutral",
+        "displayName": "dark track"
+      },
+      "light-progress": {
+        "role": "neutral",
+        "displayName": "light progress"
+      },
+      "dark-progress": {
+        "role": "neutral",
+        "displayName": "dark progress"
       }
     },
-    "themeReferences": [
-      "@theme_bg_color",
-      "@theme_base_color",
-      "@theme_fg_color",
-      "@theme_selected_bg_color",
-      "@theme_selected_fg_color"
-    ],
+    "typographyMeta": {
+      "body": {
+        "purpose": "Native desktop text; installed family fallback determines actual metrics."
+      }
+    },
+    "shadows": [],
+    "motion": [],
+    "breakpoints": [],
     "notes": [
-      "No tonal ramp is defined in the application; none is promoted to design tokens.",
-      "Native control radii, focus, shadows and body typography depend on the installed GTK theme."
+      "No application tonal ramps or motion scale are defined; none are synthesized as implementation tokens.",
+      "GTK layout requests are not guaranteed allocations.",
+      "Dark mode follows GTK prefer-dark, dark theme names or GNOME prefer-dark."
     ]
   },
   "components": [
     {
-      "name": "Botón lateral (equivalente documental)",
+      "name": "Principal light (analogía documental)",
       "kind": "button",
-      "refersTo": "sidebar-button",
-      "description": "Traducción HTML del padding y fondo explícitos; el tema GTK no se representa.",
-      "html": "<button class=\"ds-sidebar\">Canciones</button>",
-      "css": ".ds-sidebar { background: transparent; border: none; box-shadow: none; padding: 8px; font-size: 14px; color: inherit; } .ds-sidebar:hover { background: color-mix(in srgb, currentColor 8%, transparent); } .ds-sidebar:focus-visible { outline: auto; }"
+      "description": "Equivalente HTML ilustrativo del estilo explícito. La implementación real es GTK 3.",
+      "html": "<button class=\"ds-primary\">Reproducir</button>",
+      "css": ".ds-primary { background:#c92c4c; color:#ffffff; padding:6px 22px; border:0; border-radius:6px; font:500 13px Inter,Ubuntu,Cantarell,sans-serif; min-height:28px; } .ds-primary:hover { background:#b92341; } .ds-primary:focus-visible { outline:2px solid #cf3453; outline-offset:2px; } .ds-primary:disabled { opacity:.45; }",
+      "refersTo": "primary-light"
     },
     {
-      "name": "Buscador (equivalente documental)",
+      "name": "Principal dark (analogía documental)",
+      "kind": "button",
+      "description": "Equivalente HTML ilustrativo del estilo explícito. La implementación real es GTK 3.",
+      "html": "<button class=\"ds-primary\">Reproducir</button>",
+      "css": ".ds-primary { background:#d63151; color:#ffffff; padding:6px 22px; border:0; border-radius:6px; font:500 13px Inter,Ubuntu,Cantarell,sans-serif; min-height:28px; } .ds-primary:hover { background:#c92c4c; } .ds-primary:focus-visible { outline:2px solid #cf3453; outline-offset:2px; } .ds-primary:disabled { opacity:.45; }",
+      "refersTo": "primary-dark"
+    },
+    {
+      "name": "Secundario (analogía documental)",
+      "kind": "button",
+      "description": "Equivalente HTML ilustrativo del estilo explícito. La implementación real es GTK 3.",
+      "html": "<button class=\"ds-secondary\">Mostrar más</button>",
+      "css": ".ds-secondary {background:#f1f0f4;color:#242426;padding:6px 14px;border:0;border-radius:6px;font:13px Inter,Ubuntu,Cantarell,sans-serif;} .ds-secondary:hover {background:#ebebee;} .ds-secondary:active {background:#e1e1e5;} .ds-secondary:focus-visible {outline:2px solid #cf3453;outline-offset:2px;}",
+      "refersTo": "secondary-light"
+    },
+    {
+      "name": "Buscador (analogía documental)",
       "kind": "input",
-      "description": "Widget nativo sin personalización visual propia; esta vista usa el control HTML del navegador.",
-      "html": "<input class=\"ds-search\" type=\"search\" aria-label=\"Buscar en tu biblioteca local\" placeholder=\"Buscar en tu biblioteca local\">",
-      "css": ".ds-search:focus-visible { outline: auto; }"
+      "description": "Equivalente HTML ilustrativo del estilo explícito. La implementación real es GTK 3.",
+      "html": "<input class=\"ds-search\" type=\"search\" placeholder=\"Buscar\" aria-label=\"Buscar en la biblioteca local\">",
+      "css": ".ds-search {background:#e8e7ec;color:#242426;border:1px solid transparent;border-radius:7px;min-height:31px;font:12px Inter,Ubuntu,Cantarell,sans-serif;} .ds-search:focus-visible {border-color:#d63151;outline:none;}",
+      "refersTo": "search-light"
     },
     {
-      "name": "Navegación (equivalente documental)",
+      "name": "Navegación (analogía documental)",
       "kind": "nav",
-      "description": "Biblioteca lateral; no se simula un estado seleccionado inexistente.",
-      "html": "<nav class=\"ds-nav\" aria-label=\"Tu biblioteca\"><button>Canciones</button><button>Álbumes</button><button>Artistas</button><button>Favoritos</button></nav>",
-      "css": ".ds-nav { display: flex; flex-direction: column; gap: 12px; } .ds-nav button { background: transparent; border: none; box-shadow: none; padding: 8px; font-size: 14px; color: inherit; text-align: start; } .ds-nav button:hover { background: color-mix(in srgb, currentColor 8%, transparent); } .ds-nav button:focus-visible { outline: auto; }"
+      "description": "Equivalente HTML ilustrativo del estilo explícito. La implementación real es GTK 3.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Biblioteca\"><button aria-current=\"page\">Álbumes</button><button>Canciones</button></nav>",
+      "css": ".ds-nav {background:#f3f2f5;padding:16px 12px;display:flex;flex-direction:column;gap:4px;color:#242426;} .ds-nav button {background:transparent;color:inherit;border:0;border-radius:6px;padding:4px 10px;min-height:26px;text-align:left;font:13px Inter,Ubuntu,Cantarell,sans-serif;} .ds-nav button[aria-current] {background:#e3e1e7;} .ds-nav button:hover {background:#ebebee;} .ds-nav button:focus-visible {outline:2px solid #cf3453;outline-offset:2px;}",
+      "refersTo": "navigation-light"
+    },
+    {
+      "name": "Álbum sin carátula (analogía documental)",
+      "kind": "card",
+      "description": "Equivalente HTML ilustrativo del estilo explícito. La implementación real es GTK 3.",
+      "html": "<button class=\"ds-album\"><span class=\"ds-cover\">♪</span><span class=\"ds-title\">Álbum local</span><span class=\"ds-artist\">Artista</span></button>",
+      "css": ".ds-album {display:flex;flex-direction:column;gap:5px;padding:0 0 8px;background:transparent;color:#242426;border:0;border-radius:8px;text-align:left;font-family:Inter,Ubuntu,Cantarell,sans-serif;} .ds-cover {display:grid;place-items:center;width:170px;height:170px;border-radius:8px;background:#efedf2;color:#b3aebc;font-size:64px;} .ds-title {font-size:13px;font-weight:500;} .ds-artist {font-size:12px;color:#77717e;} .ds-album:hover {background:#f5f4f7;} .ds-album:focus-visible {outline:2px solid #cf3453;outline-offset:2px;}"
     }
   ],
   "narrative": {
-    "overview": "Referencia funcional y visual solicitada: Apple Music; implementación actual con widgets GTK 3 e identidad propia. La biblioteca lateral, tabla central y controles inferiores describen la superficie implementada. No se ha acordado una metáfora creativa adicional.",
+    "overview": "Music de macOS es la referencia visual elegida por el usuario. q_AMusik la expresa con identidad propia mediante una barra lateral compacta, un reproductor superior y una biblioteca de carátulas sobre superficies neutras. La implementación es Python y GTK 3; no usa una interfaz web.\n\nEl modo claro u oscuro sigue la preferencia del sistema: preferencia GTK, nombre del tema con «dark» o esquema GNOME «prefer-dark». La paleta de la ventana es explícita; los diálogos y controles auxiliares conservan comportamiento nativo. No se ha elegido una metáfora adicional.",
     "keyCharacteristics": [
-      "Widgets y tipografía del escritorio.",
-      "Fondos, texto, selección y foco heredados del tema GTK.",
-      "Un acento de marca y organización mediante espacios y separadores."
+      "Biblioteca de carátulas con jerarquía tipográfica sobria.",
+      "Acento rosa rojizo sobre blanco/gris cálido o carbón neutro.",
+      "Controles, navegación y semántica GTK nativos."
     ],
     "rules": [],
     "dos": [
-      "**Do** conservar los colores y la tipografía del tema GTK para controles nativos.",
-      "**Do** mantener nombres accesibles en controles con símbolos.",
-      "**Do** verificar la interfaz en Linux antes de declarar calidad visual o accesibilidad."
+      "**Do** conservar los modos claro y oscuro siguiendo el sistema.",
+      "**Do** mantener nombres accesibles y ayudas en controles con símbolos.",
+      "**Do** usar carátulas locales reales y el sustituto neutro cuando falten.",
+      "**Do** verificar los cambios visuales sobre la aplicación GTK en Linux."
     ],
     "donts": [
-      "**Don't** presentar vistas HTML de documentación como capturas GTK.",
-      "**Don't** sustituir los colores dependientes del tema por valores hex inventados.",
-      "**Don't** copiar recursos propietarios de Apple."
+      "**Don't** presentar analogías HTML como capturas o pruebas de GTK.",
+      "**Don't** copiar logotipos ni recursos propietarios de Apple.",
+      "**Don't** introducir contenido de demostración en la biblioteca real."
     ]
   }
 }
