@@ -42,6 +42,18 @@ Un resultado positivo sólo acredita prerrequisitos anunciados por el motor.
 No acredita MusicKit, VMP, autorización, reproducción completa, calidad de audio,
 compatibilidad con Wayland ni equivalencia con la app de macOS.
 
+## Primer resultado · 2026-11-06
+
+En [la prueba 42299929326](https://github.com/QRod/q_AMusik/actions/runs/42299929326),
+Ubuntu 24.04 con Qt WebEngine 6.4.2 anunció AAC (`probably`), EME y Widevine.
+Se utilizó el CDM que ya estaba instalado en el runner, con perfil off-the-record
+y sin desactivar el sandbox. No se usó ninguna cuenta de Apple ni se solicitó
+una licencia. La prueba de Ubuntu 22.04 se consulta en esa misma ejecución.
+
+Esto permite continuar evaluando un motor interno; no selecciona aún el runtime
+de producción ni confirma que Apple acepte el cliente. El paso siguiente necesita
+las credenciales de MusicKit del proyecto y reproducción real autorizada.
+
 ## Datos que faltan
 
 1. Confirmar acceso a una membresía de desarrollador del propietario del proyecto.
