@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.venv/
+dist/
+build/
+validation/
+*.db
+*.db-*
+.env*
+*.pem
+*.p8
+.DS_Store
