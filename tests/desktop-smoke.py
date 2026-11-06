@@ -81,6 +81,7 @@ with tempfile.TemporaryDirectory(prefix='q-amusik-desktop-') as temporary:
     phase = 0
     entered = time.monotonic()
     javascript = None
+    native_xid = None
 
     def capture(name):
         geometry = window.geometry()
@@ -92,7 +93,7 @@ with tempfile.TemporaryDirectory(prefix='q-amusik-desktop-') as temporary:
         javascript = value
 
     def advance():
-        global phase, entered, javascript
+        global phase, entered, javascript, native_xid
         try:
             if time.monotonic()-entered > 40:
                 raise AssertionError(f'Timeout en fase {phase}')
@@ -100,6 +101,7 @@ with tempfile.TemporaryDirectory(prefix='q-amusik-desktop-') as temporary:
                 if window.container is None:
                     return
                 assert window.child.poll() is None
+                native_xid = int(window.winId())
                 capture('desktop-hosted.png')
                 window.send_command('play')
             elif phase == 1:
@@ -110,6 +112,7 @@ with tempfile.TemporaryDirectory(prefix='q-amusik-desktop-') as temporary:
                 if not window.web_loaded or window.local_playing:
                     return
                 assert not window.browser.page().isAudioMuted()
+                assert int(window.winId()) == native_xid, 'La superficie nativa no debe recrearse al abrir WebEngine'
                 capture('apple-public.png' if public else 'desktop-web-fixture.png')
                 if public:
                     window.browser.page().runJavaScript('document.title', result)

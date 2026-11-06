@@ -12,6 +12,7 @@ jobs:
     if: ${{ !startsWith(github.head_ref || github.ref_name, 'research/') }}
     timeout-minutes: 15
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-22.04, ubuntu-24.04]
     runs-on: ${{ matrix.os }}

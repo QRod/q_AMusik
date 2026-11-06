@@ -71,6 +71,9 @@ class DesktopWindow(QtWidgets.QMainWindow):
         self.local_playing = False
         self.active_source = "library"
         self.web_loaded = False
+        self.service_started = False
+        self.engine_ready = False
+        self.pending_xid = None
         self.stack = QtWidgets.QStackedWidget()
         self.setCentralWidget(self.stack)
         self.loading = QtWidgets.QLabel("Cargando tu biblioteca…")
@@ -100,6 +103,12 @@ class DesktopWindow(QtWidgets.QMainWindow):
         layout.addWidget(self.drm_note)
         self.browser_layout = layout
         self.web_index = self.stack.addWidget(self.web_panel)
+        # Qt 6.4 recrea la superficie nativa al añadir el primer widget GL.
+        # Preparar la vista vacía antes de alojar GTK evita destruir su XID.
+        # about:blank no contacta con Apple ni con un navegador externo.
+        self.ensure_browser()
+        self.stack.setCurrentIndex(self.web_index)
+        self.browser.setUrl(QtCore.QUrl("about:blank"))
         parent_socket, child_socket = socket.socketpair()
         self.channel = parent_socket
         self.channel.setblocking(False)
@@ -152,16 +161,8 @@ class DesktopWindow(QtWidgets.QMainWindow):
                 xid = event.get("xid")
                 if type(xid) is not int or not 0 < xid < 2**32:
                     continue
-                self.foreign = QtGui.QWindow.fromWinId(xid)
-                if self.foreign is None:
-                    continue
-                self.container = QtWidgets.QWidget.createWindowContainer(self.foreign)
-                self.container.setMinimumSize(960, 680)
-                self.container.setFocusPolicy(enum(QtCore.Qt, "FocusPolicy", "StrongFocus"))
-                self.stack.removeWidget(self.loading)
-                self.local_index = self.stack.insertWidget(0, self.container)
-                self.web_index = self.stack.indexOf(self.web_panel)
-                self.stack.setCurrentIndex(self.local_index)
+                self.pending_xid = xid
+                self.attach_library()
             elif kind == "apple":
                 self.show_apple()
             elif kind == "playing":
@@ -175,6 +176,20 @@ class DesktopWindow(QtWidgets.QMainWindow):
                     self.silence_web()
             elif kind == "theme":
                 self.apply_theme(event.get("dark") is True)
+
+    def attach_library(self):
+        if not self.engine_ready or self.pending_xid is None or self.container is not None:
+            return
+        self.foreign = QtGui.QWindow.fromWinId(self.pending_xid)
+        if self.foreign is None:
+            return
+        self.container = QtWidgets.QWidget.createWindowContainer(self.foreign)
+        self.container.setMinimumSize(960, 680)
+        self.container.setFocusPolicy(enum(QtCore.Qt, "FocusPolicy", "StrongFocus"))
+        self.stack.removeWidget(self.loading)
+        self.local_index = self.stack.insertWidget(0, self.container)
+        self.web_index = self.stack.indexOf(self.web_panel)
+        self.stack.setCurrentIndex(self.local_index)
 
     def check_startup(self):
         if self.container is None and not self.closing:
@@ -205,12 +220,16 @@ class DesktopWindow(QtWidgets.QMainWindow):
         self.browser.loadFinished.connect(self.loaded)
         self.browser.loadStarted.connect(lambda: self.web_status.setText("Conectando con Apple…"))
         self.browser_layout.addWidget(self.browser, 1)
-        self.browser.setUrl(QtCore.QUrl(self.service_url))
+        self.browser.page().setAudioMuted(True)
 
     def show_apple(self):
         self.active_source = "apple"
         self.send_command("pause")
         self.ensure_browser()
+        if not self.service_started:
+            self.service_started = True
+            self.web_loaded = False
+            self.browser.setUrl(QtCore.QUrl(self.service_url))
         self.set_web_muted(self.local_playing)
         self.stack.setCurrentIndex(self.web_index)
 
@@ -239,9 +258,16 @@ class DesktopWindow(QtWidgets.QMainWindow):
 
     def reload_web(self):
         if self.browser is not None:
+            self.service_started = True
+            self.web_loaded = False
             self.browser.setUrl(QtCore.QUrl(self.service_url))
 
     def loaded(self, success):
+        if not self.service_started:
+            self.engine_ready = bool(success)
+            self.web_status.setText("Cargando tu biblioteca…")
+            self.attach_library()
+            return
         self.web_loaded = bool(success)
         self.web_status.setText("Reproductor integrado" if success else "No se pudo cargar. Comprueba tu conexión y pulsa Recargar.")
 
