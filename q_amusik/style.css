@@ -1,15 +1,94 @@
-/* El tema GTK del sistema conserva las señales de foco y alto contraste. */
-.sidebar { background-color: @theme_bg_color; padding: 22px 16px; border-right: 1px solid alpha(@theme_fg_color, 0.12); }
-.sidebar button { border: none; box-shadow: none; background: transparent; padding: 8px; }
-.sidebar button:hover { background: alpha(@theme_fg_color, 0.08); }
-.sidebar button label { font-size: 14px; }
-.brand { font-size: 24px; font-weight: 700; color: #c92c50; margin-bottom: 20px; }
-.eyebrow { font-size: 11px; font-weight: 700; opacity: 0.72; margin-top: 16px; }
-.page-title { font-size: 30px; font-weight: 700; }
-.section-title { font-size: 24px; font-weight: 600; }
-.muted { opacity: 0.75; }
-.player { background: @theme_bg_color; padding: 16px 24px; border-top: 1px solid alpha(@theme_fg_color, 0.12); }
-.now-playing { font-weight: 600; }
-treeview { background: @theme_base_color; }
-treeview.view { padding: 10px; }
-treeview:selected { background: @theme_selected_bg_color; color: @theme_selected_fg_color; }
+/* Paleta propia; widgets con navegación, foco y semántica GTK. */
+.music-window { background: #ffffff; color: #242426; font-family: "Inter", "Ubuntu", "Cantarell", sans-serif; font-size: 13px; }
+.music-window.dark { background: #1e1e20; color: #f4f4f5; }
+.music-window label { color: inherit; }
+.music-window button { border: none; box-shadow: none; text-shadow: none; background-image: none; border-radius: 6px; color: inherit; min-height: 28px; }
+.music-window button:hover { background: #ebebee; }
+.music-window.dark button:hover { background: #38383d; }
+.music-window button:focus { outline: 2px solid #cf3453; outline-offset: 2px; }
+.music-window button:disabled { opacity: .45; }
+.music-window button:active { background: #e1e1e5; }
+.music-window.dark button:active { background: #46464d; }
+.music-window .sidebar { background: #f3f2f5; border-right: 1px solid #e3e2e6; padding: 16px 12px; }
+.music-window.dark .sidebar { background: #28282c; border-color: #38383d; }
+.music-window .brand-row { color: #d63151; margin: 8px 9px 18px; }
+.music-window.dark .brand-row { color: #ff6d86; }
+.music-window .brand { font-size: 22px; font-weight: 700; letter-spacing: -.5px; }
+.music-window .nav-section { font-size: 11px; font-weight: 600; color: #747079; margin: 18px 10px 7px; }
+.music-window.dark .nav-section { color: #a7a5ad; }
+.music-window .nav-item { background: transparent; padding: 4px 10px; min-height: 26px; }
+.music-window .nav-item label { font-size: 13px; }
+.music-window .nav-item image { color: #d63151; }
+.music-window.dark .nav-item image { color: #ff6d86; }
+.music-window .nav-item.selected { background: #e3e1e7; }
+.music-window.dark .nav-item.selected { background: #414147; }
+.music-window .sidebar entry { background: #e8e7ec; border: 1px solid transparent; box-shadow: none; border-radius: 7px; min-height: 31px; color: #242426; font-size: 12px; }
+.music-window.dark .sidebar entry { background: #36363c; color: #f4f4f5; }
+.music-window .sidebar entry:focus { border-color: #d63151; }
+.music-window .sidebar entry image { color: #7c7783; }
+.music-window .account { background: transparent; color: #68636f; font-size: 12px; margin-top: 12px; }
+.music-window.dark .account { color: #b9b5c0; }
+.music-window .player-header { background: #f8f8f9; border-bottom: 1px solid #e3e2e6; box-shadow: none; padding: 8px 18px; min-height: 62px; color: #434148; }
+.music-window.dark .player-header { background: #242426; border-color: #38383d; color: #e5e3e9; }
+.music-window .icon-button { background: transparent; padding: 4px 7px; min-height: 26px; min-width: 22px; }
+.music-window .icon-button:checked, .music-window .icon-button.enabled { color: #d63151; background: #fbe6eb; }
+.music-window.dark .icon-button:checked, .music-window.dark .icon-button.enabled { color: #ff8198; background: #4b2e39; }
+.music-window .play-button { background: transparent; padding: 5px 10px; min-width: 32px; }
+.music-window .play-button image { -gtk-icon-transform: scale(1.3); }
+.music-window .now-playing { padding: 0 12px; }
+.music-window .now-title { font-size: 12px; font-weight: 600; }
+.music-window .now-artist { font-size: 11px; color: #77727f; }
+.music-window.dark .now-artist { color: #b3afba; }
+.music-window .time { font-size: 9px; color: #716d78; }
+.music-window.dark .time { color: #b3afba; }
+.music-window scale { padding: 2px 0; min-height: 6px; }
+.music-window scale trough { min-height: 3px; background: #dedde2; border: none; }
+.music-window.dark scale trough { background: #49494f; }
+.music-window scale highlight { background: #8d8992; border: none; min-height: 3px; }
+.music-window.dark scale highlight { background: #c7c3ce; }
+.music-window scale slider { min-width: 8px; min-height: 8px; margin: -3px; border: none; background: #8d8992; box-shadow: none; }
+.music-window.dark scale slider { background: #c7c3ce; }
+.music-window .content { background: #ffffff; }
+.music-window.dark .content { background: #1e1e20; }
+.music-window .content-heading { margin: 28px 30px 0; padding-bottom: 16px; border-bottom: 1px solid #eeedf0; }
+.music-window.dark .content-heading { border-color: #38383d; }
+.music-window .page-title { font-size: 28px; font-weight: 700; letter-spacing: -.6px; }
+.music-window .library { margin: 16px 30px 12px; }
+.music-window .subtitle { font-size: 12px; color: #77717e; }
+.music-window.dark .subtitle { color: #b4aeba; }
+.music-window flowbox { background: transparent; }
+.music-window flowboxchild { padding: 0; margin: 0; border: none; background: transparent; }
+.music-window .album-card { padding: 0 0 8px; background: transparent; border-radius: 8px; }
+.music-window .album-card:hover { background: #f5f4f7; }
+.music-window.dark .album-card:hover { background: #2c2c30; }
+.music-window .album-title { font-size: 13px; font-weight: 500; }
+.music-window .album-artist { font-size: 12px; color: #77717e; }
+.music-window.dark .album-artist { color: #b4aeba; }
+.music-window .cover { background: #efedf2; color: #b3aebc; }
+.music-window.dark .cover { background: #35353c; color: #76717f; }
+.music-window .collection-artist { color: #d63151; font-size: 20px; font-weight: 500; }
+.music-window.dark .collection-artist { color: #ff6d86; }
+.music-window .primary { background: #c92c4c; color: #ffffff; padding: 6px 22px; font-weight: 500; }
+.music-window .primary:hover { background: #b92341; }
+.music-window.dark .primary { background: #d63151; color: #ffffff; }
+.music-window.dark .primary:hover { background: #c92c4c; }
+.music-window .secondary { background: #f1f0f4; padding: 6px 14px; }
+.music-window.dark .secondary { background: #36363c; }
+.music-window .status { font-size: 11px; color: #77717e; margin: 8px 30px 16px; }
+.music-window.dark .status { color: #b4aeba; }
+.music-window treeview { background: #ffffff; color: #242426; border: none; }
+.music-window.dark treeview { background: #1e1e20; color: #f4f4f5; }
+.music-window treeview header button { background: transparent; border-radius: 0; border-bottom: 1px solid #e8e6eb; color: #77717e; font-size: 11px; padding: 5px 8px; }
+.music-window.dark treeview header button { border-color: #38383d; color: #b4aeba; }
+.music-window treeview:selected { background: #fbe6eb; color: #9c1937; }
+.music-window.dark treeview:selected { background: #4b2e39; color: #ffabbc; }
+.music-window .empty-title { font-size: 23px; font-weight: 600; }
+.music-window .empty-icon { color: #b4aeba; margin-bottom: 12px; }
+.music-window .apple-page { padding: 45px 28px; }
+.music-window .apple-symbol { color: #d63151; -gtk-icon-transform: scale(1.4); margin-bottom: 14px; }
+.music-window.dark .apple-symbol { color: #ff6d86; }
+.music-window .apple-title { font-size: 38px; font-weight: 700; letter-spacing: -.8px; }
+.music-window .apple-description { font-size: 14px; color: #6c6673; }
+.music-window.dark .apple-description { color: #c1bbc8; }
+.music-window .apple-note { font-size: 11px; color: #77717e; }
+.music-window.dark .apple-note { color: #b4aeba; }

@@ -1,6 +1,5 @@
 """Interfaz de escritorio GTK. El catálogo de Apple permanece en el navegador."""
 
-from pathlib import Path
 import sqlite3
 import subprocess
 import threading
@@ -12,22 +11,7 @@ from .apple import open_apple_music
 from .library import EXTENSIONS, Library, data_directory
 from .player import Player
 from .queue import Queue
-
-
-def label(text, style=None):
-    widget = Gtk.Label(label=text, xalign=0)
-    if style:
-        widget.get_style_context().add_class(style)
-    return widget
-
-
-def button(text, callback, tooltip=None):
-    widget = Gtk.Button(label=text)
-    widget.connect("clicked", callback)
-    if tooltip:
-        widget.set_tooltip_text(tooltip)
-        widget.get_accessible().set_name(tooltip)
-    return widget
+from .interface import Interface
 
 
 def clock(seconds):
@@ -35,185 +19,63 @@ def clock(seconds):
     return f"{minutes}:{seconds:02d}"
 
 
-class Window(Gtk.ApplicationWindow):
+class Window(Interface, Gtk.ApplicationWindow):
     def __init__(self, app):
         super().__init__(application=app, title="q_AMusik")
-        self.set_default_size(1120, 740)
-        self.set_size_request(820, 560)
         self.database = data_directory() / "library.db"
         self.library = Library(self.database)
         self.queue = Queue()
-        self.view = "songs"
+        self.view = "recent"
         self.playlist = None
         self.importing = False
         self.updating_seek = False
         self.player = Player(self.advance, self.notify, self.playback_state)
-        provider = Gtk.CssProvider()
-        provider.load_from_path(str(Path(__file__).with_name("style.css")))
-        Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), provider, 600)
-        header = Gtk.HeaderBar(title="q_AMusik", subtitle="Tu música, en Linux")
-        header.set_show_close_button(True)
-        header.pack_end(button("Añadir carpeta", lambda *_: self.choose(True)))
-        header.pack_end(button("Añadir canciones", lambda *_: self.choose(False)))
-        self.set_titlebar(header)
-        root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.add(root)
-        body = Gtk.Box()
-        root.pack_start(body, True, True, 0)
-        sidebar = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
-        sidebar.set_size_request(210, -1)
-        sidebar.get_style_context().add_class("sidebar")
-        sidebar.pack_start(label("q_AMusik", "brand"), False, False, 0)
-        sidebar.pack_start(label("APPLE MUSIC", "eyebrow"), False, False, 0)
-        sidebar.pack_start(button("Escuchar suscripción", lambda *_: self.navigate("apple")), False, False, 0)
-        sidebar.pack_start(label("TU BIBLIOTECA", "eyebrow"), False, False, 0)
-        for title, view in (("Canciones", "songs"), ("Álbumes", "albums"),
-                            ("Artistas", "artists"), ("Favoritos", "favorites")):
-            sidebar.pack_start(button(title, lambda _, v=view: self.navigate(v)), False, False, 0)
-        sidebar.pack_start(label("LISTAS LOCALES", "eyebrow"), False, False, 0)
-        self.playlist_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
-        playlist_scroll = Gtk.ScrolledWindow()
-        playlist_scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-        playlist_scroll.add(self.playlist_box)
-        sidebar.pack_start(playlist_scroll, True, True, 0)
-        sidebar.pack_end(button("+ Nueva lista", self.new_playlist), False, False, 0)
-        body.pack_start(sidebar, False, False, 0)
-        content = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=16)
-        content.set_border_width(24)
-        body.pack_start(content, True, True, 0)
-        self.title_label = label("Canciones", "page-title")
-        content.pack_start(self.title_label, False, False, 0)
-        self.search = Gtk.SearchEntry(placeholder_text="Buscar en tu biblioteca local")
-        self.search.connect("search-changed", lambda *_: self.refresh())
-        content.pack_start(self.search, False, False, 0)
-        self.stack = Gtk.Stack()
-        content.pack_start(self.stack, True, True, 0)
-        self.build_tracks()
-        self.build_apple()
-        self.status = label("Añade tu música para empezar.", "muted")
-        self.status.set_line_wrap(True)
-        self.status.set_selectable(True)
-        content.pack_end(self.status, False, False, 0)
-        self.build_controls(root)
+        self.setup_interface()
         self.refresh_playlists()
         self.refresh()
         self.connect("destroy", self.cleanup)
         self.timer = GLib.timeout_add(400, self.tick)
 
-    def build_tracks(self):
-        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
-        actions = Gtk.Box(spacing=8)
-        actions.pack_start(button("Reproducir", self.play_selected), False, False, 0)
-        actions.pack_start(button("♥ Favorito", self.favorite), False, False, 0)
-        actions.pack_start(button("Añadir a lista", self.add_to_playlist), False, False, 0)
-        actions.pack_end(button("Quitar", self.remove_selected, "Quitar referencia; conservar archivo"), False, False, 0)
-        box.pack_start(actions, False, False, 0)
-        self.store = Gtk.ListStore(int, str, str, str, str, str)
-        self.table = Gtk.TreeView(model=self.store)
-        self.table.set_enable_search(False)
-        self.table.get_selection().set_mode(Gtk.SelectionMode.MULTIPLE)
-        for index, name in enumerate(("", "Título", "Artista", "Álbum", "Tiempo"), 1):
-            cell = Gtk.CellRendererText()
-            cell.set_property("ellipsize", 3)
-            column = Gtk.TreeViewColumn(name, cell, text=index)
-            column.set_resizable(True)
-            column.set_expand(index in (2, 3, 4))
-            if index in (2, 3, 4):
-                column.set_min_width(100)
-            self.table.append_column(column)
-        self.table.connect("row-activated", lambda *_: self.play_selected())
-        scroll = Gtk.ScrolledWindow()
-        scroll.add(self.table)
-        box.pack_start(scroll, True, True, 0)
-        self.empty = label("Tu biblioteca empieza aquí. Añade canciones o una carpeta.", "muted")
-        self.empty.set_line_wrap(True)
-        box.pack_start(self.empty, False, False, 0)
-        self.stack.add_named(box, "library")
-
-    def build_apple(self):
-        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
-        box.pack_start(label("Tu suscripción de Apple Music", "section-title"), False, False, 20)
-        text = label("Escucha tu catálogo, radio y listas en el reproductor oficial de Apple.\n\n"
-                     "Se abrirá en tu navegador. Inicia sesión allí con tu cuenta de Apple "
-                     "y una suscripción activa.\n\nLos controles de esta ventana corresponden "
-                     "a tus archivos locales. La integración del catálogo dentro de q_AMusik "
-                     "está pendiente.")
-        text.set_line_wrap(True)
-        text.set_max_width_chars(65)
-        box.pack_start(text, False, False, 0)
-        launch = button("Abrir Apple Music e iniciar sesión", self.launch_apple)
-        launch.get_style_context().add_class("suggested-action")
-        launch.set_halign(Gtk.Align.START)
-        box.pack_start(launch, False, False, 0)
-        note = label("Si sólo escuchas avances, comprueba tu cuenta, suscripción y los permisos "
-                     "de contenido protegido del navegador. No se incluyen descargas offline "
-                     "del catálogo ni se garantiza paridad con macOS.", "muted")
-        note.set_line_wrap(True)
-        note.set_max_width_chars(65)
-        box.pack_start(note, False, False, 0)
-        self.stack.add_named(box, "apple")
-
-    def build_controls(self, root):
-        panel = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
-        panel.get_style_context().add_class("player")
-        row = Gtk.Box(spacing=12)
-        self.now = label("Sin reproducción", "now-playing")
-        self.now.set_ellipsize(3)
-        self.now.set_size_request(180, -1)
-        row.pack_start(self.now, True, True, 0)
-        row.pack_start(button("⏮", self.previous, "Canción anterior"), False, False, 0)
-        self.play_button = button("▶", self.toggle, "Reproducir o pausar")
-        row.pack_start(self.play_button, False, False, 0)
-        row.pack_start(button("⏭", lambda *_: self.advance(False), "Canción siguiente"), False, False, 0)
-        shuffle = Gtk.ToggleButton(label="Aleatorio")
-        shuffle.connect("toggled", lambda b: setattr(self.queue, "shuffle", b.get_active()))
-        row.pack_start(shuffle, False, False, 0)
-        self.repeat = button("Repetir: no", self.repeat_mode)
-        row.pack_start(self.repeat, False, False, 0)
-        volume = Gtk.VolumeButton()
-        volume.set_value(0.8)
-        self.player.volume(0.8)
-        volume.connect("value-changed", lambda _, v: self.player.volume(v))
-        volume.set_tooltip_text("Volumen local")
-        row.pack_end(volume, False, False, 0)
-        panel.pack_start(row, False, False, 0)
-        timeline = Gtk.Box(spacing=10)
-        self.elapsed, self.duration = label("0:00"), label("0:00")
-        self.seek = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, 0, 1, 1)
-        self.seek.set_draw_value(False)
-        self.seek.get_accessible().set_name("Posición de reproducción local")
-        self.seek.connect("change-value", self.seek_to)
-        timeline.pack_start(self.elapsed, False, False, 0)
-        timeline.pack_start(self.seek, True, True, 0)
-        timeline.pack_end(self.duration, False, False, 0)
-        panel.pack_start(timeline, False, False, 0)
-        root.pack_end(panel, False, False, 0)
+    def search_changed(self, *_):
+        if self.view == "apple" and self.search.get_text():
+            self.navigate("songs")
+        else:
+            self.refresh()
 
     def notify(self, text):
         self.status.set_text(text)
+        self.status.set_visible(bool(text))
 
     def navigate(self, view, playlist=None, title=None):
         self.view, self.playlist = view, playlist
-        names = dict(songs="Canciones", albums="Álbumes", artists="Artistas",
-                     favorites="Favoritos", apple="Apple Music", playlist="Lista")
+        self.collection = None
+        self.album_limit = 120
+        names = dict(recent="Añadido recientemente", songs="Canciones", albums="Álbumes",
+                     artists="Artistas", favorites="Favoritos", apple="Apple Music", playlist="Lista")
         self.title_label.set_text(title or names[view])
-        self.search.set_visible(view != "apple")
         self.stack.set_visible_child_name("apple" if view == "apple" else "library")
         self.refresh()
+        self.update_navigation()
 
     def refresh(self):
+        selected_ids = set(self.selected())
         self.visible_tracks = self.library.tracks(self.search.get_text(), self.view == "favorites", self.playlist)
-        if self.view == "albums":
-            self.visible_tracks.sort(key=lambda t: (t.album.casefold(), t.artist.casefold(), t.title.casefold()))
+        if self.collection is not None:
+            self.visible_tracks = [track for track in self.visible_tracks if track.id in self.collection]
+        if self.view == "recent" and self.collection is None:
+            self.visible_tracks.sort(key=lambda track: track.id, reverse=True)
+        elif self.view == "albums":
+            self.visible_tracks.sort(key=lambda track: (track.album.casefold(), track.artist.casefold(), track.title.casefold()))
         self.store.clear()
         for track in self.visible_tracks:
-            self.store.append([track.id, "♥" if track.favorite else "", track.title,
+            self.store.append([track.id, "starred-symbolic" if track.favorite else "", track.title,
                                track.artist, track.album, clock(track.duration)])
-        self.empty.set_visible(not self.visible_tracks)
-        self.empty.set_text("No hay coincidencias." if self.search.get_text() else
-                            "No hay canciones en esta vista. Añade música a tu biblioteca o lista.")
-        if self.view != "apple" and not self.importing:
-            self.notify(f"{len(self.visible_tracks)} canciones · Los archivos originales se conservan en su ubicación.")
+        for row in self.store:
+            if row[0] in selected_ids:
+                self.table.get_selection().select_iter(row.iter)
+        self.render_library()
+        if not self.importing:
+            self.notify("")
 
     def selected(self):
         model, paths = self.table.get_selection().get_selected_rows()
@@ -228,7 +90,9 @@ class Window(Gtk.ApplicationWindow):
 
     def play(self, track):
         if track:
-            self.now.set_text(f"{track.title} · {track.artist}")
+            self.now.set_text(track.title)
+            self.now_artist.set_text(track.artist)
+            self.now_cover.load(track.path)
             self.now.set_tooltip_text(f"{track.title}\n{track.artist}\n{track.album}")
             self.player.play(track)
 
@@ -255,12 +119,21 @@ class Window(Gtk.ApplicationWindow):
 
     def playback_state(self, playing):
         if hasattr(self, "play_button"):
-            self.play_button.set_label("⏸" if playing else "▶")
+            name = "media-playback-pause-symbolic" if playing else "media-playback-start-symbolic"
+            self.play_button.set_image(Gtk.Image.new_from_icon_name(name, Gtk.IconSize.BUTTON))
 
     def repeat_mode(self, *_):
         modes = ["off", "all", "one"]
         self.queue.repeat = modes[(modes.index(self.queue.repeat) + 1) % 3]
-        self.repeat.set_label("Repetir: " + {"off": "no", "all": "todo", "one": "una"}[self.queue.repeat])
+        mode = self.queue.repeat
+        name = "media-playlist-repeat-song-symbolic" if mode == "one" else "media-playlist-repeat-symbolic"
+        self.repeat.set_image(Gtk.Image.new_from_icon_name(name, Gtk.IconSize.BUTTON))
+        self.repeat.set_tooltip_text({"off": "Repetición desactivada", "all": "Repetir toda la cola", "one": "Repetir canción"}[mode])
+        context = self.repeat.get_style_context()
+        if mode == "off":
+            context.remove_class("enabled")
+        else:
+            context.add_class("enabled")
 
     def tick(self):
         position, duration = self.player.position()
@@ -351,13 +224,15 @@ class Window(Gtk.ApplicationWindow):
         dialog.destroy()
 
     def refresh_playlists(self):
+        for key in list(self.nav_items):
+            if key[0] == "playlist":
+                del self.nav_items[key]
         for child in self.playlist_box.get_children():
             child.destroy()
         for playlist_id, name in self.library.playlists():
-            item = button(name, lambda _, p=playlist_id, n=name: self.navigate("playlist", p, n), name)
-            item.get_child().set_ellipsize(3)
-            self.playlist_box.pack_start(item, False, False, 0)
+            self.add_nav(self.playlist_box, name, "view-list-symbolic", "playlist", playlist_id)
         self.playlist_box.show_all()
+        self.update_navigation()
 
     def add_to_playlist(self, *_):
         if self.importing:
@@ -413,6 +288,12 @@ class Window(Gtk.ApplicationWindow):
         GLib.source_remove(self.timer)
         self.player.close()
         self.library.close()
+        self.artwork.close()
+        self.settings.disconnect(self.theme_signal)
+        self.settings.disconnect(self.dark_signal)
+        if self.desktop_settings:
+            self.desktop_settings.disconnect(self.desktop_signal)
+        Gtk.StyleContext.remove_provider_for_screen(Gdk.Screen.get_default(), self.provider)
 
 
 class Application(Gtk.Application):
@@ -424,7 +305,7 @@ class Application(Gtk.Application):
         if window is None:
             window = Window(self)
             window.show_all()
-            window.empty.set_visible(not window.visible_tracks)
+            window.navigate("recent")
         window.present()
 
 
