@@ -60,6 +60,8 @@ class Interface:
         self.update_theme()
         self.build_player_header()
         root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        if getattr(self, "embedded_header", None) is not None:
+            root.pack_start(self.embedded_header, False, False, 0)
         self.add(root)
         body = Gtk.Box()
         root.pack_start(body, True, True, 0)

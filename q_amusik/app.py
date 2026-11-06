@@ -26,6 +26,9 @@ WindowBase = Gtk.Plug if EMBEDDED else Gtk.ApplicationWindow
 class Window(Interface, WindowBase):
     def __init__(self, app):
         super().__init__(application=app, title="q_AMusik")
+        self.embedded_header = None
+        if EMBEDDED:
+            self.set_decorated(False)
         self.desktop_channel = None
         if EMBEDDED:
             from .child_channel import ChildChannel
@@ -44,13 +47,21 @@ class Window(Interface, WindowBase):
         self.connect("destroy", self.cleanup)
         self.timer = GLib.timeout_add(400, self.tick)
         if EMBEDDED:
-            self.get_titlebar().set_show_close_button(False)
             if os.environ.get("Q_AMUSIK_TEST_AUDIO") == "1":
                 from gi.repository import Gst
                 sink = Gst.ElementFactory.make("fakesink")
                 sink.set_property("sync", True)
                 self.player.pipeline.set_property("audio-sink", sink)
             GLib.idle_add(self.desktop_ready)
+
+    def set_titlebar(self, header):
+        if EMBEDDED:
+            # Un Gtk.Plug no debe crear una decoración CSD cuyo XID cambie
+            # cuando Qt lo aloja. La barra es contenido de la biblioteca.
+            self.embedded_header = header
+            header.set_show_close_button(False)
+        else:
+            super().set_titlebar(header)
 
     def desktop_ready(self):
         self.desktop_channel.send({"event": "ready", "xid": int(self.get_id())})
