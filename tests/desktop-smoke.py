@@ -102,6 +102,12 @@ with tempfile.TemporaryDirectory(prefix='q-amusik-desktop-') as temporary:
                     return
                 assert window.child.poll() is None
                 native_xid = int(window.winId())
+                # Evita que un tooltip tape títulos en la evidencia de biblioteca.
+                try:
+                    from PyQt6.QtGui import QCursor
+                except ImportError:
+                    from PyQt5.QtGui import QCursor
+                QCursor.setPos(10, 10)
                 capture('desktop-hosted.png')
                 window.send_command('play')
             elif phase == 1:

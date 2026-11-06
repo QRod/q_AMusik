@@ -288,6 +288,7 @@ class DesktopWindow(QtWidgets.QMainWindow):
                     max(screen.top(), min(center.y(), screen.bottom()-dialog.height())))
         layout = QtWidgets.QVBoxLayout(dialog)
         identity = QtWidgets.QLabel("Ventana de acceso · q_AMusik")
+        identity.setFixedHeight(24)
         layout.addWidget(identity)
         view = QWebEngineView(dialog)
         dialog.web_view = view
@@ -298,7 +299,7 @@ class DesktopWindow(QtWidgets.QMainWindow):
         page.setAudioMuted(self.active_source != "apple" or self.local_playing)
         view.urlChanged.connect(lambda url: identity.setText(url.host() or "Acceso de Apple"))
         page.windowCloseRequested.connect(dialog.close)
-        layout.addWidget(view)
+        layout.addWidget(view, 1)
         self.popups.append(dialog)
         dialog.finished.connect(lambda *_: self.popups.remove(dialog) if dialog in self.popups else None)
         dialog.setAttribute(enum(QtCore.Qt, "WidgetAttribute", "WA_DeleteOnClose"))
