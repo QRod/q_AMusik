@@ -161,7 +161,7 @@ class Interface:
         header.set_show_close_button(True)
         header.get_style_context().add_class("player-header")
         controls = Gtk.Box(spacing=2)
-        controls.pack_start(icon_button("media-shuffle-symbolic", "Reproducción aleatoria",
+        controls.pack_start(icon_button("media-playlist-shuffle-symbolic", "Reproducción aleatoria",
                     lambda b: setattr(self.queue, "shuffle", b.get_active()), toggle=True), False, False, 0)
         controls.pack_start(icon_button("media-skip-backward-symbolic", "Canción anterior", self.previous), False, False, 0)
         self.play_button = icon_button("media-playback-start-symbolic", "Reproducir o pausar", self.toggle, "play-button")
@@ -171,11 +171,12 @@ class Interface:
         controls.pack_start(self.repeat, False, False, 0)
         header.pack_start(controls)
         playing = Gtk.Box(spacing=10)
+        playing.set_hexpand(False)
         playing.get_style_context().add_class("now-playing")
         self.now_cover = Cover(self.artwork, size=44)
         playing.pack_start(self.now_cover, False, False, 0)
         details = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
-        details.set_size_request(280, -1)
+        details.set_size_request(340, -1)
         self.now = text("q_AMusik", "now-title", True)
         self.now_artist = text("Elige algo que te encante.", "now-artist", True)
         details.pack_start(self.now, False, False, 0)

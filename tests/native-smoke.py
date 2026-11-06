@@ -3,7 +3,7 @@ from pathlib import Path
 import os
 import sys
 import tempfile
-import cairo
+import subprocess
 import faulthandler
 faulthandler.enable()
 
@@ -15,7 +15,9 @@ with tempfile.TemporaryDirectory(prefix='q-amusik-smoke-') as directory:
     os.environ['XDG_DATA_HOME'] = directory
     os.environ['NO_AT_BRIDGE'] = '1'
     from q_amusik.app import Application, Window
-    from gi.repository import Gdk, GLib, Gst, Gtk
+    import gi
+    gi.require_version('GdkX11', '3.0')
+    from gi.repository import Gdk, GdkX11, GLib, Gst, Gtk
     app = Application()
     app.register(None)
     window = Window(app)
@@ -32,6 +34,7 @@ with tempfile.TemporaryDirectory(prefix='q-amusik-smoke-') as directory:
         window.library.add_to_playlist(playlist, track.id)
     window.refresh_playlists()
     window.show_all()
+    window.get_display().get_default_seat().get_pointer().warp(Gdk.Screen.get_default(), 10, 10)
     window.settings.set_property('gtk-application-prefer-dark-theme', False)
     window.navigate('recent')
     errors = []
@@ -43,13 +46,10 @@ with tempfile.TemporaryDirectory(prefix='q-amusik-smoke-') as directory:
 
     def capture(name):
         print('Captura:', name, flush=True)
-        # Render GTK con la asignación real. Evita el fallo Cairo/MIME de
-        # gdk_pixbuf_get_from_window en ciertas versiones de GTK 3/X11.
-        image = cairo.ImageSurface(cairo.FORMAT_ARGB32,
-                                   window.get_allocated_width(), window.get_allocated_height())
-        window.draw(cairo.Context(image))
-        image.write_to_png(str(artifact/name))
-        image.finish()
+        # Captura X11 externa: incluye las subventanas de TreeView y evita el
+        # fallo Cairo/MIME de gdk_pixbuf_get_from_window en GTK 3.
+        xid = window.get_window().get_xid()
+        subprocess.run(['import', '-window', str(xid), str(artifact/name)], check=True, timeout=10)
 
     def initial():
         assert window.player.loaded and window.player.playing
@@ -85,6 +85,8 @@ with tempfile.TemporaryDirectory(prefix='q-amusik-smoke-') as directory:
         window.repeat_mode()
         assert window.queue.repeat == 'one'
         window.player.seek(1)
+
+    def playlist_view():
         capture('playlist-dark.png')
         window.settings.set_property('gtk-application-prefer-dark-theme', False)
         window.navigate('songs')
@@ -117,10 +119,12 @@ with tempfile.TemporaryDirectory(prefix='q-amusik-smoke-') as directory:
     def empty():
         capture('empty-dark.png')
         window.notify('No se encuentra el archivo. Comprueba la unidad conectada.')
+
+    def error_view():
         capture('error-dark.png')
         window.player.pause()
 
-    steps = iter([initial, dark, artists, album, compact, compact_grid, no_results, apple, empty])
+    steps = iter([initial, dark, artists, album, playlist_view, compact, compact_grid, no_results, apple, empty, error_view])
     def advance():
         try:
             step = next(steps)

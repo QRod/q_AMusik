@@ -21,7 +21,7 @@ jobs:
       - name: Dependencias del sistema
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-gi python3-gi-cairo python3-mutagen gir1.2-gtk-3.0 gir1.2-gstreamer-1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-libav gstreamer1.0-pulseaudio xdg-utils xvfb dbus-x11 desktop-file-utils
+          sudo apt-get install -y python3-gi python3-gi-cairo python3-mutagen gir1.2-gtk-3.0 gir1.2-gstreamer-1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-libav gstreamer1.0-pulseaudio xdg-utils xvfb dbus-x11 desktop-file-utils imagemagick
       - name: Pruebas de lógica
         run: /usr/bin/python3 -m unittest discover -s tests -v
       - name: Interfaz y reproducción sin dispositivo físico
