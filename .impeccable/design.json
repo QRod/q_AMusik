@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-06T20:55:10.097601+00:00",
+  "title": "Design System: q_AMusik",
+  "extensions": {
+    "platform": "GTK 3 desktop; HTML snippets are documentation analogues, not native previews.",
+    "sources": [
+      "q_amusik/style.css",
+      "q_amusik/app.py"
+    ],
+    "validation": {
+      "method": "static extraction",
+      "nativeRuntime": "pending",
+      "screenshots": "pending",
+      "visualApproval": false
+    },
+    "colorMeta": {
+      "brand": {
+        "role": "primary",
+        "displayName": "Acento de marca"
+      }
+    },
+    "themeReferences": [
+      "@theme_bg_color",
+      "@theme_base_color",
+      "@theme_fg_color",
+      "@theme_selected_bg_color",
+      "@theme_selected_fg_color"
+    ],
+    "notes": [
+      "No tonal ramp is defined in the application; none is promoted to design tokens.",
+      "Native control radii, focus, shadows and body typography depend on the installed GTK theme."
+    ]
+  },
+  "components": [
+    {
+      "name": "Botón lateral (equivalente documental)",
+      "kind": "button",
+      "refersTo": "sidebar-button",
+      "description": "Traducción HTML del padding y fondo explícitos; el tema GTK no se representa.",
+      "html": "<button class=\"ds-sidebar\">Canciones</button>",
+      "css": ".ds-sidebar { background: transparent; border: none; box-shadow: none; padding: 8px; font-size: 14px; color: inherit; } .ds-sidebar:hover { background: color-mix(in srgb, currentColor 8%, transparent); } .ds-sidebar:focus-visible { outline: auto; }"
+    },
+    {
+      "name": "Buscador (equivalente documental)",
+      "kind": "input",
+      "description": "Widget nativo sin personalización visual propia; esta vista usa el control HTML del navegador.",
+      "html": "<input class=\"ds-search\" type=\"search\" aria-label=\"Buscar en tu biblioteca local\" placeholder=\"Buscar en tu biblioteca local\">",
+      "css": ".ds-search:focus-visible { outline: auto; }"
+    },
+    {
+      "name": "Navegación (equivalente documental)",
+      "kind": "nav",
+      "description": "Biblioteca lateral; no se simula un estado seleccionado inexistente.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Tu biblioteca\"><button>Canciones</button><button>Álbumes</button><button>Artistas</button><button>Favoritos</button></nav>",
+      "css": ".ds-nav { display: flex; flex-direction: column; gap: 12px; } .ds-nav button { background: transparent; border: none; box-shadow: none; padding: 8px; font-size: 14px; color: inherit; text-align: start; } .ds-nav button:hover { background: color-mix(in srgb, currentColor 8%, transparent); } .ds-nav button:focus-visible { outline: auto; }"
+    }
+  ],
+  "narrative": {
+    "overview": "Referencia funcional y visual solicitada: Apple Music; implementación actual con widgets GTK 3 e identidad propia. La biblioteca lateral, tabla central y controles inferiores describen la superficie implementada. No se ha acordado una metáfora creativa adicional.",
+    "keyCharacteristics": [
+      "Widgets y tipografía del escritorio.",
+      "Fondos, texto, selección y foco heredados del tema GTK.",
+      "Un acento de marca y organización mediante espacios y separadores."
+    ],
+    "rules": [],
+    "dos": [
+      "**Do** conservar los colores y la tipografía del tema GTK para controles nativos.",
+      "**Do** mantener nombres accesibles en controles con símbolos.",
+      "**Do** verificar la interfaz en Linux antes de declarar calidad visual o accesibilidad."
+    ],
+    "donts": [
+      "**Don't** presentar vistas HTML de documentación como capturas GTK.",
+      "**Don't** sustituir los colores dependientes del tema por valores hex inventados.",
+      "**Don't** copiar recursos propietarios de Apple."
+    ]
+  }
+}
