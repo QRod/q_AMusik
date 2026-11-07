@@ -1,5 +1,11 @@
 # Camino hacia un cliente completo
 
+## 0.3 · Reproductor oficial integrado
+- Vista Qt WebEngine dentro de la ventana, con sesión privada y acceso de Apple.
+- Biblioteca GTK conservada mediante X11/XWayland; coordinación de fuentes de audio.
+- Carga pública, audio de fixture, instalación y cierre verificados en Ubuntu 22/24.
+- Pendiente: prueba con cuenta real, segundo factor, canción completa y Zorin.
+
 ## 0.1 · Base implementada
 - Interfaz GTK nativa en español, biblioteca SQLite y motor GStreamer.
 - Importación, búsqueda, favoritos y listas locales; controles de reproducción.
@@ -12,7 +18,10 @@
 - Probar inicio de sesión y reproducción completa del servicio en el navegador.
 - Completar las pruebas manuales de actualización y desinstalación del .deb.
 
-## Integración del catálogo en la interfaz propia
+## Alternativa futura: catálogo en la interfaz propia
+
+La vía actual elegida es el reproductor oficial incrustado. Esta alternativa
+mediante MusicKit no es un requisito para usarlo.
 - Configurar un identificador de medios y un firmante de tokens MusicKit bajo
   la cuenta de desarrollador del propietario; claves privadas fuera del cliente.
 - Prototipar reproducción oficial en Linux con DRM antes de fijar el motor web.

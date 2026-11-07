@@ -1,153 +1,108 @@
-# q_AMusik · 0.2.0
+# q_AMusik · 0.3.0
 
-Aplicación de escritorio **nativa para Linux**, inspirada en Apple Music.
-Primera versión de desarrollo: reproductor local GTK/GStreamer y acceso al
-reproductor oficial de Apple Music en el navegador. Proyecto independiente de Apple.
+Reproductor de escritorio para Ubuntu/Zorin con **biblioteca local nativa y
+Apple Music dentro de la misma ventana**. La suscripción utiliza el reproductor
+oficial incrustado: no abre un navegador externo ni requiere que contrates
+Apple Developer Program. Proyecto independiente de Apple; versión preliminar.
 
 [![Linux](https://github.com/QRod/q_AMusik/actions/workflows/linux.yml/badge.svg)](https://github.com/QRod/q_AMusik/actions/workflows/linux.yml)
 
-[Descargar .deb](https://github.com/QRod/q_AMusik/releases/tag/v0.2.0) ·
+[Descargar .deb](https://github.com/QRod/q_AMusik/releases/tag/v0.3.0) ·
 [Instalación](docs/INSTALACION.md) · [Cambios](CHANGELOG.md) · [Licencia MIT](LICENSE)
 
-![Biblioteca local de q_AMusik ejecutada en Ubuntu con álbumes y carátulas de demostración.](docs/images/biblioteca-clara.png)
+## Instalar o actualizar
 
-*Captura de la prueba automatizada en Ubuntu: archivos WAV y carátulas geométricas de
-demostración. No contiene música del catálogo ni datos de una cuenta real.*
-
-<details>
-<summary>Modo oscuro</summary>
-
-![La misma biblioteca sintética en modo oscuro.](docs/images/biblioteca-oscura.png)
-
-</details>
-
-## Instalación rápida
-
-Descarga `q-amusik_0.2.0_all.deb` y `SHA256SUMS` desde la
-[publicación v0.2.0](https://github.com/QRod/q_AMusik/releases/tag/v0.2.0).
-En la carpeta donde guardaste ambos archivos:
+Descarga `q-amusik_0.3.0_all.deb` y `SHA256SUMS` desde la
+[publicación v0.3.0](https://github.com/QRod/q_AMusik/releases/tag/v0.3.0), en la misma carpeta:
 
 ```sh
 sha256sum -c SHA256SUMS
 sudo apt update
-sudo apt install ./q-amusik_0.2.0_all.deb
+sudo apt install ./q-amusik_0.3.0_all.deb
 q-amusik
 ```
 
-Continúa si la suma muestra `OK`. La [guía de instalación](docs/INSTALACION.md)
-incluye requisitos de Ubuntu/Zorin, descarga desde terminal, actualización,
-respaldo y desinstalación.
+Continúa si la suma muestra `OK`. Cierra la versión anterior antes de actualizar;
+se conservan canciones, favoritos y listas locales.
 
-## Estado real
+Para escuchar canciones completas de la suscripción hacen falta una cuenta con
+Apple Music activo y **Widevine compatible instalado**. Qt puede utilizar el CDM
+incluido en Google Chrome instalado en Linux; Chrome no se ejecuta para escuchar.
+El `.deb` no incluye ni descarga ese componente. Consulta los
+[requisitos y pasos de instalación](docs/INSTALACION.md).
 
-| Función | Implementación |
+## Usar la aplicación
+
+- **Biblioteca local:** añade canciones o carpetas. Álbumes, artistas, búsqueda,
+  favoritos, listas, cola y controles de reproducción siguen siendo nativos.
+- **Apple Music:** pulsa «Escuchar» en la barra lateral. Inicia sesión desde el
+  reproductor oficial que aparece dentro de q_AMusik; la autorización también
+  permanece en ventanas de la aplicación.
+- **Volver:** pulsa «Mi biblioteca». Se pausa y silencia el audio web, incluidas
+  las ventanas secundarias. Entrar en Apple Music pausa el audio local.
+
+Los controles y listas del servicio pertenecen al reproductor oficial; las listas
+locales son independientes. No se añade sincronización de archivos locales hacia
+Apple ni equivalencia con todas las funciones de Music para macOS.
+
+## Funciones y compatibilidad
+
+| Área | Alcance |
 |---|---|
-| Biblioteca local | Importar archivos o carpetas recursivamente; sin copiar el audio |
-| Formatos | MP3, FLAC, Ogg, Opus, M4A/AAC, WAV y AIFF, según códecs instalados |
-| Metadatos | Título, artista, álbum y duración; nombre de archivo como alternativa |
-| Organización | Búsqueda, favoritos y listas; cuadrículas de álbumes/artistas y tabla de canciones |
-| Reproducción local | Pausa, anterior/siguiente, posición, volumen, aleatorio, repetición |
-| Carátulas | Incrustadas en MP3/FLAC/M4A o imágenes cover/folder JPG y PNG de la carpeta |
-| Apariencia | Claro y oscuro siguiendo las preferencias del escritorio |
-| Persistencia | SQLite en el directorio de datos del usuario |
-| Suscripción de Apple Music | Abrir `music.apple.com` en navegador; sesión y reproducción allí |
-| Catálogo dentro de esta interfaz | Pendiente: MusicKit, credenciales de desarrollador y validación DRM |
-| Paridad con la app de macOS | No alcanzada; consulta [ROADMAP.md](ROADMAP.md) |
+| Biblioteca local | Importación recursiva sin copiar el audio, metadatos y SQLite |
+| Formatos locales | MP3, FLAC, Ogg, Opus, M4A/AAC, WAV y AIFF, según códecs |
+| Organización | Búsqueda, favoritos, listas y cuadrículas de álbumes/artistas |
+| Reproducción local | Pausa, anterior/siguiente, posición, volumen, aleatorio y repetición |
+| Carátulas | Incrustadas en MP3/FLAC/M4A o imágenes cover/folder JPG y PNG |
+| Apariencia local | Claro/oscuro según preferencias del escritorio |
+| Apple Music | Reproductor oficial dentro de la ventana, sesión propia y DRM del motor |
+| Escritorio | X11; Wayland mediante XWayland para alojar la biblioteca GTK |
+| Pruebas | Ubuntu 22.04/Qt 5 y Ubuntu 24.04/Qt 6, x86_64 |
+| Pendiente manual | Cuenta real, segundo factor, canciones completas, audio físico y Zorin |
 
-Los controles locales no controlan Apple Music. Las listas y favoritos locales no
-se sincronizan con tu cuenta. No se incluyen descargas offline del catálogo,
-lossless del servicio, Dolby Atmos ni AirPlay. La extensión de un archivo no
-garantiza que el códec esté disponible o que el contenido no tenga DRM.
-
-## Ejecutar en Ubuntu / Zorin
-
-Objetivos iniciales: Ubuntu 22.04/24.04 y Zorin basado en esas versiones.
-La compatibilidad debe confirmarse en cada distribución con audio real.
-No ejecutes la aplicación como root.
-
-```sh
-sudo apt update
-sudo apt install python3-gi python3-gi-cairo python3-mutagen gir1.2-gtk-3.0 gir1.2-gstreamer-1.0 \
-  gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad \
-  gstreamer1.0-libav gstreamer1.0-pulseaudio xdg-utils
-git clone https://github.com/QRod/q_AMusik.git
-cd q_AMusik
-/usr/bin/python3 -m q_amusik
-```
-
-Usa Python del sistema: un entorno virtual aislado no suele encontrar PyGObject
-instalado mediante APT. No hay dependencias de pip ni Node para ejecutar la app.
-
-1. Añade archivos o carpetas desde la cabecera.
-2. Haz doble clic en una canción para iniciar la cola de la vista actual.
-3. Selecciona varias filas con Ctrl/Mayús para favoritos o listas.
-4. En «Escuchar suscripción», abre Apple Music e inicia sesión en el sitio oficial.
-
-Durante una importación puedes buscar y reproducir. La edición de favoritos,
-listas y referencias espera hasta que termine el escaneo para evitar bloqueos.
-
-La apariencia sigue el tema GTK del escritorio y, cuando está disponible, la
-preferencia clara/oscura de GNOME/Zorin. Las carátulas se leen de las etiquetas
-del archivo o de `cover.jpg`, `cover.png`, `folder.jpg` y `folder.png` en su carpeta.
-Cuando no hay imagen, se muestra un sustituto neutro; no se descarga arte externo.
-
-Si hay Chrome/Chromium instalado, se solicita una ventana de aplicación del
-navegador; de lo contrario se utiliza el navegador predeterminado. q_AMusik no
-instala navegadores ni módulos DRM. Comprueba el permiso de contenido protegido
-si el servicio no reproduce canciones completas. El acceso web depende de Apple,
-del navegador, de la región y de tu suscripción; aún no se ha probado aquí con
-una cuenta real. Cierra o pausa el navegador antes de volver a reproducir música
-local para evitar dos fuentes simultáneas.
-
-## Paquete .deb
-
-En Linux con `dpkg-deb`:
-
-```sh
-python3 packaging/build-deb.py
-sudo apt install ./dist/q-amusik_0.2.0_all.deb
-q-amusik
-```
-
-El paquete instala sólo esta aplicación en `/usr/share/q-amusik`, su lanzador,
-icono y entrada de menú. La arquitectura `all` corresponde al código Python;
-los códecs y GTK son paquetes de la arquitectura del sistema. No incluye skills,
-herramientas compartidas, credenciales ni datos locales. La construcción,
-instalación y ejecución de GTK ya pasaron en Ubuntu 24.04 mediante GitHub Actions.
-Consulta el [registro de validación](docs/validation.md) y los resultados de la matriz.
+No incluye descargas offline del catálogo, Dolby Atmos ni AirPlay. El catálogo,
+región, suscripción y autorización dependen de Apple. Cargar la página y anunciar
+soporte DRM no demuestra por sí solo reproducción completa con una cuenta.
 
 ## Datos y privacidad
 
-La base es `$XDG_DATA_HOME/q_amusik/library.db`, o
-`~/.local/share/q_amusik/library.db`. Contiene rutas y etiquetas de tu música,
-favoritos y listas. «Quitar» elimina referencias, conservando siempre el audio.
-Respáldala con la aplicación cerrada. Desinstalar el paquete conserva estos datos.
-Para eliminar la biblioteca, cierra la aplicación y elimina ese directorio desde
-tu gestor de archivos. Las sesiones de Apple se gestionan desde el navegador.
-No hay servidor, telemetría, subida de archivos ni almacenamiento de Apple ID.
+Los datos están en `~/.local/share/q_amusik/`, o `$XDG_DATA_HOME/q_amusik/`:
 
-## Desarrollo y verificación
+- `library.db`: rutas, etiquetas, favoritos y listas locales.
+- `apple-profile/`: sesión, cookies y almacenamiento del reproductor integrado.
+- `apple-cache/`: caché web.
+
+El directorio se crea privado para tu usuario. No se importan perfiles ni cookies
+personales de Chrome/Firefox. Apple gestiona el inicio de sesión; el código nativo
+no extrae contraseñas ni tokens del reproductor. Para cerrar sesión usa el menú
+de cuenta de Apple Music. Con q_AMusik cerrado puedes eliminar `apple-profile/`
+y `apple-cache/` desde el gestor de archivos para olvidar los datos web, sin tocar
+`library.db`. «Quitar» canciones nunca borra los archivos originales.
+
+## Desarrollo
+
+Se usan paquetes del sistema, sin pip ni Node. Instala las dependencias GTK y
+GStreamer descritas en [la guía](docs/INSTALACION.md), más Qt WebEngine:
+`python3-pyqt6.qtwebengine` en Ubuntu 24.04 o `python3-pyqt5.qtwebengine` en 22.04.
 
 ```sh
+git clone https://github.com/QRod/q_AMusik.git
+cd q_AMusik
+/usr/bin/python3 -m q_amusik
 python3 -m unittest discover -s tests -v
-python3 -m compileall -q q_amusik packaging tests
-# Sólo Linux, con xvfb, dbus-x11 e imagemagick:
-dbus-run-session -- xvfb-run -a -s '-screen 0 1600x1200x24' /usr/bin/python3 tests/native-smoke.py
+python3 packaging/build-deb.py
 ```
 
-La prueba nativa genera audio WAV sintético, verifica GTK y reproducción con un
-sumidero de prueba, comprueba las vistas y ambos temas, y guarda capturas en `validation/`. No comprueba el dispositivo
-de audio físico, Apple ID, DRM ni una suscripción. El flujo de GitHub Actions
-incluye Ubuntu 22.04/24.04; el badge enlaza a los resultados de ambas plataformas.
+El workflow Linux verifica lógica, interfaz GTK, alojamiento GTK/Qt, audio web y
+local de prueba, ventanas internas, retorno entre fuentes, construcción e
+instalación. La comprobación pública de Apple es separada y no usa una cuenta.
+Las capturas y canciones sintéticas de prueba no se instalan en tu biblioteca.
 
-Arquitectura y decisiones: [docs/architecture.md](docs/architecture.md).
+[Arquitectura](docs/architecture.md) · [Integración Apple Music](docs/INTEGRACION-APPLE-MUSIC.md) ·
+[Validación](docs/validation.md) · [Hoja de ruta](ROADMAP.md)
 
 ## Licencia
 
-El código de q_AMusik se distribuye bajo la [licencia MIT](LICENSE).
-Las dependencias conservan sus propias licencias. No se distribuye contenido
-del catálogo de Apple ni se conceden derechos sobre sus marcas.
-
-Referencias oficiales: [MusicKit](https://developer.apple.com/musickit/),
-[autenticación](https://developer.apple.com/documentation/applemusicapi/user-authentication-for-musickit),
-[Apple Music web](https://support.apple.com/en-euro/guide/music-web/apdm8de77edb/web).
+Código bajo [MIT](LICENSE); las dependencias conservan sus licencias.
+No se distribuyen el catálogo, recursos del reproductor de Apple ni el CDM.
+La vista oficial los carga directamente desde sus proveedores.

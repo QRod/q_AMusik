@@ -27,6 +27,7 @@ def main():
             "packaging/io.github.qrod.qAMusik.desktop": "usr/share/applications/io.github.qrod.qAMusik.desktop",
             "assets/io.github.qrod.qAMusik.svg": "usr/share/icons/hicolor/scalable/apps/io.github.qrod.qAMusik.svg",
             "README.md": "usr/share/doc/q-amusik/README.md",
+            "docs/INSTALACION.md": "usr/share/doc/q-amusik/INSTALACION.md",
             "LICENSE": "usr/share/doc/q-amusik/copyright",
         }
         for source, destination in files.items():
@@ -44,7 +45,7 @@ Section: sound
 Priority: optional
 Depends: python3 (>= 3.10), python3-gi, python3-gi-cairo, python3-mutagen, python3-pyqt6.qtwebengine | python3-pyqt5.qtwebengine, gir1.2-gtk-3.0, gir1.2-gstreamer-1.0, gstreamer1.0-plugins-base, gstreamer1.0-plugins-good, gstreamer1.0-plugins-bad, gstreamer1.0-libav, gstreamer1.0-pulseaudio, xdg-utils
 Description: Biblioteca musical nativa para Ubuntu y Zorin
- Reproduce archivos locales y abre el reproductor oficial de Apple Music.
+ Reproduce archivos locales y aloja Apple Music dentro de la misma ventana.
 """, encoding="utf-8")
         target = output / f"q-amusik_{__version__}_all.deb"
         subprocess.run(["dpkg-deb", "--root-owner-group", "--build", str(package), str(target)], check=True)

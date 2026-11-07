@@ -1,5 +1,27 @@
 # Verificación · 2026-11-06
 
+## Reproductor integrado v0.3.0
+
+[Ejecución 42304467855](https://github.com/QRod/q_AMusik/actions/runs/42304467855):
+Ubuntu 22.04/Qt 5 y Ubuntu 24.04/Qt 6 completaron lógica, UI GTK, contenedor
+GTK/Qt, construcción e instalación. La página pública real de Apple Music cargó
+sin cuenta y mostró controles, sin lanzar un navegador externo.
+
+El smoke integrado usa WAV silencioso y un servicio HTTP de fixture en loopback.
+Con clicks nativos comprueba reproducción web, pausa de GStreamer al cambiar,
+ventana secundaria con audio, cierre/silencio al volver y reproducción local.
+Exige que el proceso GTK termine con código cero y que el identificador nativo
+de ventana no cambie al abrir WebEngine. El cierre ya no genera avisos críticos.
+
+La disponibilidad anunciada de AAC/EME/Widevine se midió aparte, sin solicitudes
+de licencia ni cuenta Apple. No prueba autorización, segundo factor, licencia de
+una canción completa, calidad de audio, salida física o compatibilidad de Zorin.
+Esas comprobaciones requieren la cuenta y el equipo del usuario.
+
+Las ventanas de acceso de fixture se identifican como prueba y no piden datos.
+Las capturas públicas de Apple usan un perfil nuevo y no muestran una cuenta.
+Los perfiles de prueba se crean en directorios temporales y no se distribuyen.
+
 ## Rediseño v0.2.0
 
 El rediseño conserva GTK/GStreamer y SQLite. La revisión visual independiente de

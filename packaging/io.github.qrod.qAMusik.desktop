@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=q_AMusik
-Comment=Biblioteca musical local y acceso a Apple Music
+Comment=Biblioteca local y reproductor de Apple Music integrado
 Exec=q-amusik
 Icon=io.github.qrod.qAMusik
 Terminal=false

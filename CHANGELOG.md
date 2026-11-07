@@ -1,5 +1,25 @@
 # Cambios
 
+## 0.3.0 · 2026-11-06 · Apple Music integrado (preliminar)
+
+### Añadido
+- Reproductor oficial de Apple Music dentro de la ventana de q_AMusik, con
+  ventanas de acceso propias y sesión separada de los navegadores del usuario.
+- Contenedor Qt WebEngine que conserva la biblioteca GTK mediante X11/XWayland.
+- Pausa/silencio coordinados entre audio local y web, incluidas ventanas secundarias.
+- Ayuda sobre DRM y guía de instalación incluida en el paquete.
+
+### Cambiado
+- «Escuchar» abre la vista integrada; se elimina la apertura de navegadores externos.
+- Qt se prepara en `about:blank` antes de alojar GTK para mantener estable la
+  superficie nativa, sin contactar con Apple antes de elegir su reproductor.
+
+### Límites
+- Necesita Widevine compatible y una suscripción activa. El CDM no se distribuye.
+- La carga pública y audio de prueba están verificados; el inicio de sesión y
+  canciones completas con una cuenta real requieren comprobación en el equipo del usuario.
+- No requiere Apple Developer Program para el reproductor oficial incrustado.
+
 ## 0.2.0 · 2026-11-06 · Biblioteca visual
 
 ### Cambiado

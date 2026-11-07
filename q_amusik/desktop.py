@@ -95,6 +95,9 @@ class DesktopWindow(QtWidgets.QMainWindow):
         reload_button = QtWidgets.QPushButton("Recargar")
         reload_button.clicked.connect(self.reload_web)
         toolbar.addWidget(reload_button)
+        help_button = QtWidgets.QPushButton("Requisitos")
+        help_button.clicked.connect(self.show_requirements)
+        toolbar.addWidget(help_button)
         layout.addLayout(toolbar)
         self.drm_note = QtWidgets.QLabel("Para canciones completas se necesita Widevine compatible, por ejemplo el incluido en Google Chrome instalado. Consulta la guía de instalación.")
         self.drm_note.setWordWrap(True)
@@ -263,6 +266,15 @@ class DesktopWindow(QtWidgets.QMainWindow):
             self.web_loaded = False
             self.browser.setUrl(QtCore.QUrl(self.service_url))
 
+    def show_requirements(self):
+        QtWidgets.QMessageBox.information(self, "Requisitos de Apple Music",
+            "Necesitas una suscripción activa y un CDM Widevine compatible.\n\n"
+            "Qt puede usar el módulo de Google Chrome instalado en Linux; Chrome no se abre para escuchar. "
+            "Si acabas de instalarlo, reinicia q_AMusik.\n\n"
+            "La guía está en /usr/share/doc/q-amusik/INSTALACION.md. "
+            "También está en el repositorio QRod/q_AMusik de GitHub.\n\n"
+            "Inicia sesión desde el reproductor de Apple y comprueba una canción completa.")
+
     def loaded(self, success):
         if not self.service_started:
             self.engine_ready = bool(success)
@@ -288,6 +300,7 @@ class DesktopWindow(QtWidgets.QMainWindow):
                     max(screen.top(), min(center.y(), screen.bottom()-dialog.height())))
         layout = QtWidgets.QVBoxLayout(dialog)
         identity = QtWidgets.QLabel("Ventana de acceso · q_AMusik")
+        identity.setTextFormat(enum(QtCore.Qt, "TextFormat", "PlainText"))
         identity.setFixedHeight(24)
         layout.addWidget(identity)
         view = QWebEngineView(dialog)

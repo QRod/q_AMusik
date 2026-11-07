@@ -4,8 +4,8 @@
 
 Decisión aceptada por el usuario: Python, GTK 3, GStreamer y SQLite del sistema.
 GTK 3 está disponible en las bases Ubuntu objetivo. No se necesita un runtime de
-Electron para reproducir audio local. La contrapartida es que la vista del
-catálogo todavía no está integrada.
+Electron para reproducir audio local. La contrapartida inicial era que la vista
+del catálogo no estaba integrada; ADR 003 añade el reproductor oficial interno.
 
 - `app.py`: UI y coordinación; conexión SQLite usada sólo por el hilo GTK.
 - `interface.py`: composición GTK, cuadrículas, selección y seguimiento de tema
@@ -24,7 +24,10 @@ catálogo todavía no está integrada.
   importación omite duplicados.
 - `player.py`: playbin de GStreamer, eventos de bus y archivos `file://`.
 - `queue.py`: navegación, historial aleatorio y repetición sin dependencias GTK.
-- `apple.py`: lanzamiento del sitio oficial con argumentos separados y sin shell.
+- `desktop.py`: ventana Qt, perfil web privado, autorización y coordinación de audio.
+- `web_policy.py`: política de navegación HTTPS de Apple/iCloud.
+- `child_channel.py`: canal Unix heredado con mensajes acotados y comandos fijos.
+- `qt_runtime.py`: binding Qt disponible en la distribución.
 
 Las entradas son archivos elegidos por el usuario y sus etiquetas. No se ejecutan
 como comandos, no se interpretan como markup GTK ni se insertan en SQL. Se limita
@@ -33,6 +36,8 @@ Los decodificadores son los paquetes mantenidos por la distribución. El proyect
 no procesa credenciales de Apple ni tiene un puente privilegiado a una web remota.
 
 ## ADR 002: no prometer DRM en un webview sin verificarlo
+
+Decisión inicial de 0.1/0.2; la apertura externa queda sustituida por ADR 003.
 
 MusicKit web requiere un developer token y autorización del usuario; un Apple ID
 con suscripción no sustituye las credenciales de desarrollador. Activar EME en
@@ -44,6 +49,27 @@ Esto permite empezar por una base nativa útil, pero implica dos interfaces y
 controles independientes. La suscripción no es todavía una capacidad integrada
 de este cliente. La decisión del motor para MusicKit queda abierta hasta tener
 reproducción comprobada en Ubuntu/Zorin.
+
+## ADR 003: reproductor oficial dentro de la ventana
+
+El usuario eligió incrustar el servicio oficial sin contratar Apple Developer
+Program. Se conserva GTK en un proceso hijo alojado mediante Gtk.Plug y
+QWindow/QWidget; el contenedor Qt mantiene una vista WebEngine y las ventanas
+de acceso de Apple. X11/XWayland permite este alojamiento sin reescribir la UI.
+
+Los procesos sólo intercambian controles fijos por un socketpair Unix heredado.
+La web no accede a ese canal ni a funciones nativas. La sesión usa un perfil
+privado independiente; no se inspeccionan credenciales ni perfiles de navegadores.
+
+Qt 6.4 puede recrear la superficie al añadir el primer widget OpenGL. Por ello
+se carga `about:blank` antes de alojar GTK y se comprueba que el identificador
+nativo permanezca estable al entrar en Apple Music. La página del servicio no se
+solicita hasta elegir esa vista. El cierre limpia recursos del hijo y termina
+su bucle, sin destruir dos veces la ventana extranjera.
+
+Las pruebas comprueban carga pública de Apple, controles, ventanas internas,
+audio de fixtures, alternancia y cierre. La suscripción completa requiere una
+prueba real del usuario; la disponibilidad EME/CDM no es equivalente a una licencia.
 
 ## Límites de rendimiento y verificación
 
