@@ -1,11 +1,19 @@
-# Verificación · 2026-11-06
+# Verificación · 2026-11-07
 
 ## Reproductor integrado v0.3.0
 
-[Ejecución 42304467855](https://github.com/QRod/q_AMusik/actions/runs/42304467855):
+[Ejecución 42353643523](https://github.com/QRod/q_AMusik/actions/runs/42353643523):
 Ubuntu 22.04/Qt 5 y Ubuntu 24.04/Qt 6 completaron lógica, UI GTK, contenedor
 GTK/Qt, construcción e instalación. La página pública real de Apple Music cargó
 sin cuenta y mostró controles, sin lanzar un navegador externo.
+
+La revisión visual independiente de Impeccable validó barra, ventana interna
+y retorno; su veredicto final **ship** resolvió dos correcciones documentales
+sobre la integración y su contrato. No amplía la validación a cuenta o DRM real.
+
+El paquete 0.3.0 descargado se verificó con SHA-256: contiene 19 archivos
+en las rutas esperadas, propiedad root, y sus módulos coinciden con el código
+validado. Incluye la guía de instalación, sin perfiles, CDM ni herramientas compartidas.
 
 El smoke integrado usa WAV silencioso y un servicio HTTP de fixture en loopback.
 Con clicks nativos comprueba reproducción web, pausa de GStreamer al cambiar,
@@ -85,7 +93,7 @@ siendo macOS: el paquete se construye en Linux, no se simula su instalación loc
 - Ubuntu y Zorin reales: instalación, icono, arranque, audio físico y desinstalación.
 - Formatos variados, carpetas grandes y unidades extraíbles.
 - Revisión visual, teclado, lector de pantalla y tema de alto contraste.
-- Cuenta de Apple del usuario en navegador compatible: sesión, suscripción,
+- Cuenta de Apple del usuario en el reproductor integrado: sesión, suscripción,
   reproducción completa, permisos DRM, región y cierre de sesión.
 
 El estado de desarrollo no implica equivalencia con Apple Music de macOS.

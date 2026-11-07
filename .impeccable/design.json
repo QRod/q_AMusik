@@ -3,15 +3,16 @@
   "generatedAt": "2026-11-06T21:34:49.365481+00:00",
   "title": "Design System: q_AMusik",
   "extensions": {
-    "platform": "GTK 3 desktop. HTML snippets are documentation analogues only.",
+    "platform": "GTK 3 local library hosted in a Qt WebEngine desktop container under X11/XWayland; official Apple web player embedded. HTML snippets are GTK documentation analogues only.",
     "sources": [
       "q_amusik/style.css",
       "q_amusik/interface.py",
       "q_amusik/artwork.py",
-      "q_amusik/app.py"
+      "q_amusik/app.py",
+      "q_amusik/desktop.py"
     ],
     "validation": {
-      "method": "Independent visual SHIP review of twelve native GTK X11 screenshots with identified demonstration fixtures.",
+      "method": "Independent visual SHIP review of twelve native GTK X11 screenshots with identified demonstration fixtures. Integrated extension checked against hosted-library, public Apple page, web fixture, auth-window fixture and return-to-library screenshots.",
       "screenshots": [
         "docs/images/biblioteca-clara.png",
         "docs/images/biblioteca-oscura.png"
@@ -19,7 +20,9 @@
       "visualApproval": true,
       "limits": [
         "Not an exhaustive accessibility, contrast or desktop-theme audit.",
-        "HTML detectors are not applicable to native GTK."
+        "HTML detectors are not applicable to native GTK.",
+        "Integrated-container screenshots show light appearance; earlier dark/light verification applies to GTK.",
+        "Public page and synthetic fixtures do not verify a real account, 2FA or full DRM subscription playback."
       ]
     },
     "colorMeta": {
@@ -211,7 +214,10 @@
     "notes": [
       "No application tonal ramps or motion scale are defined; none are synthesized as implementation tokens.",
       "GTK layout requests are not guaranteed allocations.",
-      "Dark mode follows GTK prefer-dark, dark theme names or GNOME prefer-dark."
+      "Dark mode follows GTK prefer-dark, dark theme names or GNOME prefer-dark.",
+      "Qt toolbar: Mi biblioteca, Apple Music identity, load status, Recargar and Requisitos; margins 16px horizontal and 10px vertical. Qt buttons use 6px radius, 8px 14px padding and a 2px pink focus border.",
+      "Qt auth dialogs reserve a fixed 24px identity/domain line above web content. Provider content is not restyled or modified.",
+      "Switching to Apple requests local pause. Returning to the library mutes every web page, requests media pause and closes auth windows. GTK transport controls remain local."
     ]
   },
   "components": [
@@ -264,23 +270,26 @@
     }
   ],
   "narrative": {
-    "overview": "Music de macOS es la referencia visual elegida por el usuario. q_AMusik la expresa con identidad propia mediante una barra lateral compacta, un reproductor superior y una biblioteca de carátulas sobre superficies neutras. La implementación es Python y GTK 3; no usa una interfaz web.\n\nEl modo claro u oscuro sigue la preferencia del sistema: preferencia GTK, nombre del tema con «dark» o esquema GNOME «prefer-dark». La paleta de la ventana es explícita; los diálogos y controles auxiliares conservan comportamiento nativo. No se ha elegido una metáfora adicional.",
+    "overview": "Music de macOS es la referencia visual elegida por el usuario. q_AMusik la expresa con identidad propia mediante una barra lateral compacta, un reproductor superior y una biblioteca de carátulas sobre superficies neutras. La biblioteca local se implementa en Python y GTK 3, alojada en un contenedor Qt WebEngine que muestra también el reproductor web oficial de Apple Music dentro de la misma ventana.\n\nEl modo claro u oscuro sigue la preferencia del sistema: preferencia GTK, nombre del tema con «dark» o esquema GNOME «prefer-dark». La paleta de la biblioteca y del contenedor es explícita; los controles auxiliares conservan comportamiento nativo de GTK o Qt. El contenido web mantiene el diseño del proveedor y su propia apariencia. No se ha elegido una metáfora adicional.\n",
     "keyCharacteristics": [
       "Biblioteca de carátulas con jerarquía tipográfica sobria.",
       "Acento rosa rojizo sobre blanco/gris cálido o carbón neutro.",
-      "Controles, navegación y semántica GTK nativos."
+      "Biblioteca con controles, navegación y semántica GTK nativos.",
+      "Reproductor oficial integrado con navegación del contenedor Qt."
     ],
     "rules": [],
     "dos": [
       "**Do** conservar los modos claro y oscuro siguiendo el sistema.",
       "**Do** mantener nombres accesibles y ayudas en controles con símbolos.",
       "**Do** usar carátulas locales reales y el sustituto neutro cuando falten.",
-      "**Do** verificar los cambios visuales sobre la aplicación GTK en Linux."
+      "**Do** verificar los cambios visuales sobre la biblioteca GTK y el contenedor Qt en Linux.",
+      "**Do** conservar el diseño del proveedor dentro del reproductor oficial."
     ],
     "donts": [
       "**Don't** presentar analogías HTML como capturas o pruebas de GTK.",
       "**Don't** copiar logotipos ni recursos propietarios de Apple.",
-      "**Don't** introducir contenido de demostración en la biblioteca real."
+      "**Don't** introducir contenido de demostración en la biblioteca real.",
+      "**Don't** presentar fixtures de acceso como pruebas de cuenta, 2FA o DRM real."
     ]
   }
 }

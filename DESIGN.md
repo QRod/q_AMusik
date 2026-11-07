@@ -123,21 +123,27 @@ components:
 
 ## Overview
 
-Music de macOS es la referencia visual elegida por el usuario. q_AMusik la expresa con identidad propia mediante una barra lateral compacta, un reproductor superior y una biblioteca de carátulas sobre superficies neutras. La implementación es Python y GTK 3; no usa una interfaz web.
+Music de macOS es la referencia visual elegida por el usuario. q_AMusik la expresa con identidad propia mediante una barra lateral compacta, un reproductor superior y una biblioteca de carátulas sobre superficies neutras. La biblioteca local se implementa en Python y GTK 3, alojada en un contenedor Qt WebEngine que muestra también el reproductor web oficial de Apple Music dentro de la misma ventana.
 
-El modo claro u oscuro sigue la preferencia del sistema: preferencia GTK, nombre del tema con «dark» o esquema GNOME «prefer-dark». La paleta de la ventana es explícita; los diálogos y controles auxiliares conservan comportamiento nativo. No se ha elegido una metáfora adicional.
+El modo claro u oscuro sigue la preferencia del sistema: preferencia GTK, nombre del tema con «dark» o esquema GNOME «prefer-dark». La paleta de la biblioteca y del contenedor es explícita; los controles auxiliares conservan comportamiento nativo de GTK o Qt. El contenido web mantiene el diseño del proveedor y su propia apariencia. No se ha elegido una metáfora adicional.
 
 **Key Characteristics:**
 - Biblioteca de carátulas con jerarquía tipográfica sobria.
 - Acento rosa rojizo sobre blanco/gris cálido o carbón neutro.
-- Controles, navegación y semántica GTK nativos.
+- Biblioteca con controles, navegación y semántica GTK nativos.
+- Reproductor oficial integrado con navegación del contenedor Qt.
 
-Extraído de `q_amusik/style.css`, `interface.py`, `artwork.py` y `app.py`.
+Extraído de `q_amusik/style.css`, `interface.py`, `artwork.py`, `app.py` y
+`desktop.py`.
 La revisión independiente dio SHIP visual sobre doce capturas de GTK en X11,
 con fixtures identificadas como demostración. Referencias publicables:
 [claro](docs/images/biblioteca-clara.png) y [oscuro](docs/images/biblioteca-oscura.png).
 Esta evidencia no constituye una auditoría exhaustiva de accesibilidad, contraste
 o compatibilidad con todos los temas. No se ejecuta un detector HTML sobre GTK.
+La extensión integrada se contrastó con capturas de la biblioteca alojada, la
+página pública de Apple, fixtures web y de ventana de acceso, y el retorno a la
+biblioteca. Estas capturas muestran el contenedor claro; la comprobación previa
+de temas corresponde a GTK. No prueban cuenta real, 2FA ni reproducción DRM.
 
 ## Colors
 
@@ -165,7 +171,9 @@ largos se eliden con Pango y tienen tooltip; los mensajes explicativos se ajusta
 
 ## Layout
 
-Ventana inicial (1280 × 820), solicitud mínima (960 × 680). La barra lateral pide
+La ventana GTK solicita inicialmente (1280 × 820) y un mínimo de (960 × 680).
+El contenedor Qt abre en (1280 × 880), con mínimo (960 × 720), y aloja la
+biblioteca bajo X11/XWayland. La barra lateral pide
 (224px) y añade padding (16px 12px); GTK resuelve la asignación final. La cabecera
 nativa superior pide altura mínima (62px) y padding (8px 18px), con transporte a
 la izquierda, carátula y reproducción al centro, volumen a la derecha. Los
@@ -176,7 +184,8 @@ Gtk.FlowBox redistribuye entre uno y seis elementos por fila según espacio;
 separación horizontal (22px), vertical (24px). La biblioteca muestra inicialmente
 hasta 120 grupos y ofrece «Mostrar más». Carátulas de cuadrícula (170px),
 colección (120px) y reproducción (44px). Tablas y biblioteca tienen scroll
-vertical; las listas laterales también. No hay breakpoints web ni modo móvil.
+vertical; las listas laterales también. La biblioteca no tiene breakpoints web ni modo móvil; el contenido oficial
+resuelve su propia distribución dentro de Qt WebEngine.
 
 ## Elevation & Depth
 
@@ -223,10 +232,26 @@ shuffle, repetición, posición y Gtk.VolumeButton; los controles son locales.
 
 ### Empty states and Apple Music
 Los estados vacíos distinguen biblioteca, favoritos, listas y búsqueda. El
-buscador sin resultados oculta la acción de importar. La superficie Apple Music
-explica que catálogo e inicio de sesión se abren en el navegador. Los diálogos
-y selectores de archivo son GTK; las analogías HTML del sidecar son únicamente
+buscador sin resultados oculta la acción de importar. Apple Music abre el
+reproductor oficial dentro de la misma ventana. Una barra Qt ofrece «Mi
+biblioteca», identidad «Apple Music», estado de carga, «Recargar» y «Requisitos»;
+sus márgenes son (16px 10px). Cuando falta un módulo Widevine conocido aparece
+una nota de requisitos. Los botones Qt usan radio (6px), padding (8px 14px),
+hover tonal y borde de foco rosa de (2px), con apariencia clara/oscura comunicada
+por GTK. No se inyecta CSS ni se modifica el diseño del contenido del proveedor.
+
+Las ventanas internas de acceso usan un diálogo Qt de hasta (600 × 760),
+ajustado al espacio disponible. Una línea de identidad/dominio de altura fija
+(24px) precede al contenido web; no es un formulario de credenciales propio.
+Al abrir Apple se solicita pausar el audio local. Al volver a «Mi biblioteca»
+se silencian todas las páginas web, se solicita pausar sus medios y se cierran
+las ventanas de acceso. Los controles de transporte GTK siguen siendo locales.
+
+Los selectores de archivo y diálogos de biblioteca son GTK; los requisitos y el
+acceso integrado usan Qt. Las analogías HTML del sidecar son únicamente
 documentales y no reproducen medidas naturales, semántica ni renderizado nativo.
+La página pública y los fixtures no verifican inicio de sesión real, 2FA ni
+canciones completas con DRM y suscripción.
 
 ## Do's and Don'ts
 
@@ -234,9 +259,11 @@ documentales y no reproducen medidas naturales, semántica ni renderizado nativo
 - **Do** conservar los modos claro y oscuro siguiendo el sistema.
 - **Do** mantener nombres accesibles y ayudas en controles con símbolos.
 - **Do** usar carátulas locales reales y el sustituto neutro cuando falten.
-- **Do** verificar los cambios visuales sobre la aplicación GTK en Linux.
+- **Do** verificar los cambios visuales sobre la biblioteca GTK y el contenedor Qt en Linux.
+- **Do** conservar el diseño del proveedor dentro del reproductor oficial.
 
 ### Don't:
 - **Don't** presentar analogías HTML como capturas o pruebas de GTK.
 - **Don't** copiar logotipos ni recursos propietarios de Apple.
 - **Don't** introducir contenido de demostración en la biblioteca real.
+- **Don't** presentar fixtures de acceso como pruebas de cuenta, 2FA o DRM real.
